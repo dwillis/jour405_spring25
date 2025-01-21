@@ -1,0 +1,28 @@
+---
+title: "Crime Rates"
+---
+
+Follow along with the demo to learn how to calculate crime rates using R and the Tidyverse. We'll also introduce a new library, janitor, which helps make column names easier to work with. You should get started by loading the tidyverse in a new R block.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
+
