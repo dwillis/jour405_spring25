@@ -1,0 +1,113 @@
+## JOUR405
+## Homework 1
+
+## Getting Started with R
+## Task One: R Overview & Preliminaries
+
+In this task, you will learn about the R programming language and write basic R commands. This will make a lot more sense after you read https://r4ds.hadley.nz/workflow-basics.html. Put your code inside the empty blocks and run them to see the result. Save often!
+
+### Basic R Commands
+
+### 1.1: Assignments in R
+
+## Assign x to 1, y to 2 and z to 3
+
+Put your code inside the block below, then click the green arrow to run your code.
+
+```{r}
+
+```
+
+### 1.2: Functions
+
+A function is code that produces some result, like printing. The function for printing is `print()`, with what you want to see printed inside the parentheses, usually in quotes, unless we're printing a variable or a number. Then, no quotes.
+
+## Have R print Hello World
+
+```{r}
+
+```
+
+## Have R print the number 42
+
+```{r}
+
+```
+
+### 1.3: Computations
+
+R can do math, too, which is very necessary for statistics. Let's have it - not you - do the math.
+
+## Add 17 to 5
+
+```{r}
+
+```
+
+## Add 5 to x (remember x from above?)
+
+```{r}
+
+```
+
+## Add 15 to 5 and store it in a variable called n
+
+```{r}
+
+```
+
+## Find the square root of 16 and store it in a variable called p.
+
+You'll need to look up the function to calculate a square root.
+
+```{r}
+
+```
+
+## Calling variable in R
+
+Calling variables means just typing the variable name in a code block and running it.
+
+Call y, see y value in console
+
+```{r}
+
+```
+
+Call x, see x value in console
+
+```{r}
+
+```
+
+### 1.4: Using the Tidyverse Library
+
+We'll be using different tools in order to work with data and generate statistics, and the main one is the tidyverse. You will be using that library in every assignment. Let's make sure it's loaded using R's `library()` function:
+
+## Load the tidyverse
+
+```{r}
+
+
+```
+
+
+## Task Two: Data Structures in R: Data frames
+
+Data frames are how R stores tabular data, like a spreadsheet. In this task, you will learn how to read a CSV file into RStudio.
+
+## Load some CSV data
+
+One thing we'll do a lot in this class is load some CSV data using the `read_csv()` function that the tidyverse provides. Follow along here: https://r4ds.hadley.nz/data-import and put the code below that loads the students.csv file from the URL provided:
+
+```{r}
+
+```
+
+You're done with code once you hit Section 7.2.1 on the page, but if you had trouble with or questions about any of this, please describe them below:
+
+
+
+
+IMPORTANT: Be sure to save your work (Cmd-S or Ctrl-S will do it) 
+and then switch over to GitHub Desktop and add, commit and push this file to GitHub. Contact me or Matt if you're having trouble.
