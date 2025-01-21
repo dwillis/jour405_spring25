@@ -1,5 +1,6 @@
-## JOUR405
-## Homework 1
+---
+title: "HW1: R Basics"
+---
 
 ## Getting Started with R
 ## Task One: R Overview & Preliminaries

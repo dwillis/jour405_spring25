@@ -1,0 +1,52 @@
+---
+title: "HW3 WH Salaries"
+---
+
+In this assignment, we will be working with a dataset containing information about the salaries of White House staffers as of July 2024.
+
+### Task 1: Load the Tidyverse
+
+You will need to load the tidyverse library
+
+```{r}
+```
+
+Then you'll load the data from the web. The URL for the data is: https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/biden_wh_salaries_2024.csv. You will create a dataframe called `wh_salaries` that contains the data from this URL.
+
+### Task 2: Load the Data and Describe It
+
+```{r}
+```
+### Task 3: Describe the Data
+
+You should examine that dataframe carefully by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the categories of incidents. From a reporting standpoint, what stands out to you about this data? Are there any salary values that will cause problems for analysis?
+
+ANSWER HERE
+
+### Task 4: Calculate the Mean and Median of the Salaries
+
+Write code to calculate the mean and median of the salaries in the dataset using the `summarize()` function. You don't need to make a new dataframe, just display the results.
+
+```{r}
+
+```
+
+### Task 5: Add in the minimum and maximum salaries
+
+Take the code you just wrote and add in the minimum and maximum salaries (the functions for that are `min()` and `max()`). Your results should show four columns: mean_salary, median_salary, min_salary, max_salary.
+
+```{r}
+
+```
+
+### Task 6: Describe the Results
+
+Write a couple of sentences describing the results of your analysis. What do the mean and median salaries tell you about the data? What do the minimum and maximum salaries tell you? Are there any outliers in the data?
+
+ANSWER HERE
+
+### Task 7: Story Idea
+
+Based on the data, what is your best story idea? What is the next step you would take to develop that story idea?
+
+ANSWER HERE
