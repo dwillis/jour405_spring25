@@ -5,17 +5,21 @@ title: "UMD Fees"
 Follow along with the demo to learn how to calculate percentage change using R and the Tidyverse. You should get started by loading the tidyverse in a new R block.
 
 
+### Task 1: Load the tidyverse
 
 
 
+### Task 2: Load the UMD Fees dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/umd_fees.csv
 
 
 
+### Task 3: Calculate the percentage change in each category between Fall 2024 and Fall 2021 using `mutate()`
 
 
 
+### Task 4: Describe our results
 
-
+Write a few sentences about what you found in the data. What's the story here?
 
 
 

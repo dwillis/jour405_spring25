@@ -2,24 +2,31 @@
 title: "Crime Rates"
 ---
 
-Follow along with the demo to learn how to calculate crime rates using R and the Tidyverse. We'll also introduce a new library, janitor, which helps make column names easier to work with. You should get started by loading the tidyverse in a new R block.
+Follow along with the demo to learn how to calculate crime rates using R and the Tidyverse. We'll also introduce a new library, janitor, which helps make column names easier to work with. You should get started by loading the tidyverse in a new R block, then install and load janitor.
+
+### Task 1: Load the tidyverse and install and load janitor
 
 
 
+### Task 2: Load the crime dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_annual_crime.csv
 
 
 
+### Task 3: Use janitor to clean up the column names
 
 
 
+### Task 4: Calculate the total crime rate for each year (picking our unit!)
 
 
 
+### Task 5: Calculate the violent and property crime rates for each year (same unit)
 
 
 
+### Task 6: Describe our results
 
-
+Write a few sentences about what you found in the data. What years had the highest crime rates? What years had the lowest crime rates? Does the pattern match your expectations?
 
 
 
