@@ -1,0 +1,28 @@
+---
+title: "Sampling"
+---
+
+Follow along with the demo to learn how to sample data from a population using R and the Tidyverse. You should get started by loading the tidyverse in a new R block.
+
+### Task 1: Load the tidyverse
+
+
+### Task 2: Load 1,000 rows of data with the ages of people from 18-80
+
+
+### Task 3: Sample 100 rows of data from the dataset
+
+
+### Task 4: Calculate the mean age and standard deviation of the sample
+
+
+### Task 5: Calculate the mean age and standard deviation of the population
+
+
+### Task 6: Compare the sample and population statistics
+
+Compare the means and standard deviations. Are they similar? Go back and re-run the sampling and statistics calculations with a smaller sample size. How do the results change?
+
+
+
+When finished, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
