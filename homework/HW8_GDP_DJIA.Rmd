@@ -1,0 +1,45 @@
+---
+title: "HW8_GDP_DJIA"
+---
+
+What is the relationship between the stock market, represented by the Dow Jones Industrial Average, or DJIA, and the Gross Domestic Product, a measure of the U.S. economic activity?
+
+You will examine that question for the past decade, from 2013 through 2024.
+
+The U.S. economy in 2013 had begun to emerge from the Great Depression and heated up in the years before the COVID-19 pandemic hit. The government and private sector shutdown in a bid to save lives, ease overcrowded hospitals and prevent a wider spread of a little-known but often debilitating and deadly virus. As economic life returned to pre-pandemic levels, the outlook for the economy mostly was positive, but inflation remained high for several years.
+
+Your task in this assignment will be to examine the relationship between those two key economic indicators, the DJIA and GDP, for the past decade. You will calculate a correlation coefficient and create a scatterplot to visualize the relationship between the two variables. As usual, you will use the Tidyverse to do this work.
+
+### Task 1: Load the tidyverse
+
+```{r}
+```
+
+### Task 2: Load the GDP and DJIA data
+
+Load the GDP data from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/gdp_djia.csv
+
+```{r}
+```
+
+### Task 3: Calculate the correlation coefficient
+
+Use the `cor()` function to calculate the correlation coefficient between the DJIA and GDP.
+
+```{r}
+```
+
+### Task 4: Create a scatterplot
+
+Use the `ggplot()` function to create a scatterplot of the DJIA and GDP. Be sure to label your axes and add a title.
+
+```{r}
+```
+
+### Task 5: Describe our results
+
+Write a few sentences about the relationship between the DJIA and GDP. Is there a strong correlation between the two variables? What does the scatterplot show?
+
+
+When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
+
