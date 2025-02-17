@@ -16,12 +16,12 @@ Follow along with the demo to learn how to calculate standard deviation and how 
 ### Task 4: Create a histogram of the number of car thefts
 
 
-### Task 5: Add a line to the histogram that shows the mean of the number of car thefts
+### Task 5: Add a line to the histogram that shows the mean of the number of car thefts, and two other lines to show one standard deviation in both directions
 
 
 ### Task 6: Describe your results
 
-Is the distribution normal or skewed in one direction? Write a sentence in which you describe the range of the data covered by one standard deviation from the mean on both sides.
+Is the distribution normal or skewed in one direction? Write a sentence in which you describe the range of the data covered by one standard deviation from the mean on both sides - how much of the data falls in that range?
 
 
 
