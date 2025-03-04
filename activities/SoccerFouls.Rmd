@@ -6,19 +6,45 @@ Do fouls matter in women's college soccer? In this assignment, you'll be working
 
 ### Task 1: Load the tidyverse
 
+```{r}
+library(tidyverse)
+```
 
 
 ### Task 2: Load the soccer dataset from https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/refs/heads/main/data/ncaa_womens_soccer_matchstats_2024.csv
 
+```{r}
+matches <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/refs/heads/main/data/ncaa_womens_soccer_matchstats_2024.csv")
+```
+
 
 ### Task 3: Create a new column called `goal_diff` that calculates the difference between the two teams' goals.
+
+```{r}
+matches <- matches |> mutate(goal_diff = team_score - opponent_score)
+```
+
 
 
 ### Task 4: Use `summarize()` and the `cor()` function to calculate the correlation between fouls and goal differential, using the pearson method.
 
+```{r}
+matches |> summarize(correlation = cor(fouls, goal_diff, method="pearson"))
+```
+
 
 
 ### Task 5: Create a scatterplot of fouls and goal differential, using `geom_point()`
+
+```{r}
+
+matches |> 
+  ggplot() +
+  geom_point(aes(x=goal_diff, y=fouls)) +
+  geom_smooth(aes(x=goal_diff, y=fouls), method="lm")
+
+```
+
 
 
 ### Task 6: Describe the results of both the correlation calculation and the scatterplot.
