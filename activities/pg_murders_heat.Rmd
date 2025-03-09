@@ -6,14 +6,44 @@ Remember how we talked about people killing each other more when it's hot outsid
 
 ### Task 1: Load the tidyverse
 
-### Task 2: Load the dataset from <https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv>
+```{r}
+library(tidyverse)
+```
+
+### Task 2: Load the dataset from [https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv](https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv)
+
+```{r}
+pg_murders <- read_csv ("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv")
+```
 
 ### Task 3: Use `summarize()` and the `cor()` function to calculate the correlation between murders and temperature, using the pearson method.
 
+```{r}
+pg_murders |> summarize(correlation = cor(murders, temperature, method="pearson"))
+```
+
 ### Task 4: Create a scatterplot of murders and temperature, using `geom_point()`. Your aes() will have temperatures on the x axis, murders on the y axis and add a label for the month (so label=month inside the aes()).
+
+```{r}
+
+pg_murders |> 
+  ggplot() +
+  geom_point(aes(x=temperature, y=murders)) +
+  geom_smooth(aes(x=temperature, y=murders), method="lm")
+
+```
 
 ### Task 5: Add labels to the scatterplot using geom_text(). Inside geom_text() put the same aes() as geom_point in Task 4, then after the aes() add size = 5.
 
-### Task 6: Describe the results of both the correlation calculation and the scatterplot.
+```{r}
 
-When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
+pg_murders |> 
+  ggplot() +
+  geom_point(aes(x=temperature, y=murders)) +
+  geom_smooth(aes(x=temperature, y=murders), method="lm") +
+  geom_text(aes(x=temperature, y=murders, label=month))
+
+```
+
+### Task 6: Describe the results of both the correlation calculation and the scatterplot.
+The scatterplot shows a positive correlation between temperature and murders the coefficient also shows a strong positive correlation. 
