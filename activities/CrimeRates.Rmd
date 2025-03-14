@@ -6,10 +6,19 @@ Follow along with the demo to learn how to calculate crime rates using R and the
 
 ### Task 1: Load the tidyverse and install and load janitor
 
+```{r}
+library(tidyverse)
+install.packages("janitor")
+library(janitor)
+```
+
 
 
 ### Task 2: Load the crime dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_annual_crime.csv
 
+```{r}
+crimes <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_annual_crime.csv") |> clean_names()
+```
 
 
 ### Task 3: Use janitor to clean up the column names
@@ -18,9 +27,17 @@ Follow along with the demo to learn how to calculate crime rates using R and the
 
 ### Task 4: Calculate the total crime rate for each year (picking our unit!)
 
+```{r}
+crimes |> mutate(total_rate = grand_total/population * 10000)
+```
+
 
 
 ### Task 5: Calculate the violent and property crime rates for each year (same unit)
+
+```{r}
+crimes_with_rates <- crimes |> mutate(violent_rate = violent_crime_total/population * 10000, property_rate = property_crime_total/population * 10000)
+```
 
 
 

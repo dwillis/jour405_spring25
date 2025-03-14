@@ -1,0 +1,19 @@
+---
+title: "PG Murders and Heat"
+---
+
+Remember how we talked about people killing each other more when it's hot outside? Let's explore that relationship using homicide and temperature data from Prince George's County. You'll load the data, perform some basic statistical analysis, and create a scatterplot to explore the relationship. Follow the steps below to complete the assignment.
+
+### Task 1: Load the tidyverse
+
+### Task 2: Load the dataset from <https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv>
+
+### Task 3: Use `summarize()` and the `cor()` function to calculate the correlation between murders and temperature, using the pearson method.
+
+### Task 4: Create a scatterplot of murders and temperature, using `geom_point()`. Your aes() will have temperatures on the x axis, murders on the y axis and add a label for the month (so label=month inside the aes()).
+
+### Task 5: Add labels to the scatterplot using geom_text(). Inside geom_text() put the same aes() as geom_point in Task 4, then after the aes() add size = 5.
+
+### Task 6: Describe the results of both the correlation calculation and the scatterplot.
+
+When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.

@@ -6,14 +6,31 @@ We'll be calculating percentiles to see how good Maryland was in service aces in
 
 ### Task 1: Load the tidyverse
 
+```{r}
+library(tidyverse)
+```
 
 ### Task 2: Load the data
 
+```{r}
+matches <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensVolleyballData/refs/heads/main/data/ncaa_womens_volleyball_matchstats_2024.csv")
+```
 
 ### Task 3: Create totals of aces for each team using `group_by()` and `summarize()`
 
+```{r}
+team_aces <- matches |> 
+  group_by(team) |> 
+  summarize(total_aces = sum(aces)) |> 
+  arrange(desc(total_aces))
+```
+
 
 ### Task 4: Calculate percentiles using `mutate()` and `ntile()`
+
+```{r}
+team_aces |> mutate(percentile = ntile(total_aces, 100))
+```
 
 
 ### Task 5: Describe the percentiles

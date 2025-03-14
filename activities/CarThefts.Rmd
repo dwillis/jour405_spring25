@@ -6,22 +6,45 @@ Follow along with the demo to learn how to calculate standard deviation and how 
 
 ### Task 1: Load the tidyverse
 
+```{r}
+library(tidyverse)
+```
+
 
 ### Task 2: Load the car thefts dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/car_thefts_jan24.csv
 
 
+```{r}
+car_thefts <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/car_thefts_jan24.csv")
+```
+
 ### Task 3: Calculate the standard deviation of the number of car thefts, along with the mean
+
+```{r}
+car_thefts |> summarize(mean = mean(count), sd = sd(count))
+```
 
 
 ### Task 4: Create a histogram of the number of car thefts
 
+```{r}
+car_thefts |> 
+  ggplot() + 
+  geom_histogram(aes(x = count), binwidth = 2) +
+  geom_vline(aes(xintercept = mean(count)), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(count) - sd(count)), color = "blue", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(count) + sd(count)), color = "blue", linetype = "dashed", size = 1)
+```
 
-### Task 5: Add a line to the histogram that shows the mean of the number of car thefts
+
+
+
+### Task 5: Add a line to the histogram that shows the mean of the number of car thefts, and two other lines to show one standard deviation in both directions
 
 
 ### Task 6: Describe your results
 
-Is the distribution normal or skewed in one direction? Write a sentence in which you describe the range of the data covered by one standard deviation from the mean on both sides.
+Is the distribution normal or skewed in one direction? Write a sentence in which you describe the range of the data covered by one standard deviation from the mean on both sides - how much of the data falls in that range?
 
 
 
