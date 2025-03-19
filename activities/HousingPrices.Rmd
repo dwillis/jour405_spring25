@@ -1,0 +1,148 @@
+---
+title: "Home Values After Transit Line Extension"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+library(tidyverse)
+library(scales)
+```
+
+## The News Story Challenge
+
+Local officials have claimed that the new light rail line has increased property values in a local neighborhood.
+
+Before the transit line opened, homes in that neighborhood sold for an average of $285,000, with a standard deviation of $32,000.
+
+Since the extension opened, your news team collected sales data from 14 recent home sales in the neighborhood:
+$297,000, $305,000, $292,000, $318,000, $290,000, $311,000, $299,000, $325,000, $302,000, $288,000, $307,000, $315,000, $320,000, $294,000
+
+As a journalist, you need to determine: **Is there statistical evidence that the transit extension has actually increased home values?**
+
+## Task 1: Organize your data
+
+```{r}
+# Known information about home values before the transit extension
+prior_mean <- 285000  # average home value
+prior_sd <- 32000     # standard deviation
+
+# Home sale prices after the transit extension opened (14 homes)
+new_prices <- c(297000, 305000, 292000, 318000, 290000, 311000, 299000, 
+                325000, 302000, 288000, 307000, 315000, 320000, 294000)
+
+# Create a journalist-friendly dataset
+home_data <- tibble(
+  sale_id = 1:14,
+  sale_price = new_prices
+)
+
+# View the data
+home_data
+```
+
+## Task 2: Calculate key statistics
+
+```{r}
+# Calculate statistics on the new home price data
+new_stats <- home_data %>%
+  summarise(
+    mean = mean(sale_price),
+    sd = sd(sale_price),
+    n = n(),
+    min = min(sale_price),
+    max = max(sale_price)
+  )
+
+new_stats
+```
+
+## Task 3: Make a chart
+
+```{r}
+# Function to format currency values
+dollar_format <- function(x) {
+  paste0("$", format(x/1000, big.mark=","), "K")
+}
+
+# Create a visualization of home prices with reference to previous average
+ggplot(home_data, aes(x = reorder(sale_id, sale_price), y = sale_price)) +
+  geom_col(fill = "seagreen", alpha = 0.8) +
+  geom_hline(yintercept = prior_mean, color = "darkred", size = 1, linetype = "dashed") +
+  annotate("text", x = 3, y = prior_mean - 8000, 
+           label = "Previous Average ($285K)", hjust = 0, fontface = "bold", color = "darkred") +
+  scale_y_continuous(labels = dollar_format) +
+  labs(
+    title = "Oak Hill Home Sales After Transit Extension",
+    subtitle = "Horizontal line shows previous neighborhood average of $285,000",
+    x = "Recent Home Sales",
+    y = "Sale Price",
+    caption = "Source: County Property Records"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
+## Task 4: Perform a hypothesis test
+
+This is where we formally test the officials' claim that the transit line has increased home values.
+
+**Hypotheses:**
+- H₀: μ ≤ $285,000 (The transit extension has not increased home values)
+- H₁: μ > $285,000 (The transit extension has increased home values)
+
+```{r}
+# Perform a one-sample t-test
+# Since we want to know if home values increased, we use a one-sided test (alternative = "greater")
+t_test_result <- t.test(
+  home_data$sale_price,
+  mu = prior_mean,
+  alternative = "greater"
+)
+
+# Display the results
+t_test_result
+```
+
+## Step 5: Interpreting the results for your news story
+
+```{r}
+# Extract the p-value
+p_value <- t_test_result$p.value
+
+# Set our significance level
+alpha <- 0.05
+
+# Compare and make a decision
+if(p_value < alpha) {
+  conclusion <- "The data provides statistical evidence supporting the claim that the transit line has increased home values."
+} else {
+  conclusion <- "The data does not provide strong statistical evidence that the transit line has increased home values."
+}
+
+# Create a tibble to display the key statistics for your story
+story_stats <- tibble(
+  `Previous average` = dollar_format(prior_mean),
+  `New average` = dollar_format(mean(new_prices)),
+  `Increase` = dollar_format(mean(new_prices) - prior_mean),
+  `Percent change` = paste0(round(((mean(new_prices) - prior_mean) / prior_mean) * 100, 1), "%"),
+  `p-value` = round(p_value, 3),
+  `Statistically significant?` = if_else(p_value < alpha, "Yes", "No")
+)
+
+# Display the key statistics
+story_stats
+```
+
+## Conclusion
+
+```{r, echo=FALSE}
+# Calculate the 95% confidence interval for the mean increase
+ci <- t.test(home_data$sale_price)$conf.int
+```
+
