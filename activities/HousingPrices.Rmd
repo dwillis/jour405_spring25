@@ -19,6 +19,8 @@ $297,000, $305,000, $292,000, $318,000, $290,000, $311,000, $299,000, $325,000, 
 
 As a journalist, you need to determine: **Is there statistical evidence that the transit line has actually increased home values?**
 
+Follow along, running the code when directed. If you have questions, ask either in class or put them just below the section you have a question about.
+
 ## Task 1: Organize your data
 
 ```{r}
