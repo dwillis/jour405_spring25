@@ -1,0 +1,177 @@
+---
+title: "Car Thefts Significance"
+name: REPLACE WITH YOUR NAME
+---
+
+Your editor wants to know if there have been recent changes in the number of car thefts in Prince George's County. Using monthly figures and significance testing, you'll come up with an answer and decide whether there's a story here. As with the previous homework, provide answers in this notebook when prompted and you will have to fill in values where you see REPLACE_ME. Get started by loading the tidyverse in a new R block.
+
+### Task 1: Load the tidyverse
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# LOAD THE TIDYVERSE
+```
+
+
+### Task 2: Load the Prince George's county crime data and generate car thefts totals by month
+
+```{r}
+
+# Read the data
+car_thefts <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/car_thefts_month.csv")  |> 
+  arrange(month)  # Sort by date
+
+# Basic inspection of the data
+glimpse(car_thefts)
+
+```
+
+### Task 3: Let's make a chart and describe the results.
+
+We'll make a line chart using geom_line() to try and illustrate any trend over time. What's your initial reaction to the change in car thefts? Is there a trend?
+
+PUT ANSWERS HERE
+
+```{r}
+
+car_thefts |> 
+ggplot(aes(x = month, y = total)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(color = "darkblue", size = 3) +
+  labs(
+    title = "Monthly Car Thefts (July 2023 - February 2025)",
+    subtitle = "Is there a trend over time?",
+    x = "Month",
+    y = "Number of Car Thefts"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(face = "bold")
+  )
+
+```
+
+### Task 4: Add the mean, standard error and calculate a margin of error based on a 95% confidence interval
+
+Let's add some stats to that process - mean and standard deviation - and calculate the standard error and 95% confidence intervals. We only have a small number of months, so we'll calculate the margin of error to account for that. 
+
+```{r}
+
+theft_summary <- car_thefts |> 
+  summarize(
+    mean_thefts = mean(total),
+    sd_thefts = sd(REPLACE_ME),
+    months = n(),
+    se_thefts = sd_thefts / sqrt(months),
+    margin_error = qt(0.975, df = months - 1) * se_thefts,  # Using t-distribution for small sample
+    ci_lower = mean_thefts - margin_error,
+    ci_upper = mean_thefts + margin_error
+  )
+
+# Display the confidence interval
+theft_summary
+```
+
+
+
+
+### Task 5: Visualize the data
+
+Let's make a better chart showing the changes and the statistics we produced in Task 4. Does this change anything about your answer from Task 3?
+
+
+
+```{r}
+# Make a better chart
+car_thefts |> 
+ggplot(aes(x = month, y = total)) +
+  geom_line(color = "steelblue", alpha = 0.7) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = theft_summary$mean_thefts, linetype = "dashed", color = "red", size = 1) +
+  geom_ribbon(aes(ymin = theft_summary$ci_lower, ymax = theft_summary$ci_upper), 
+              fill = "red", alpha = 0.2) +
+  annotate("text", x = min(car_thefts$month), 
+           y = theft_summary$mean_thefts + 10, 
+           label = paste0("Mean: ", round(theft_summary$mean_thefts, 1)), 
+           hjust = 0, color = "red") +
+  labs(
+    title = "Monthly Car Thefts with 95% Confidence Interval for the Mean",
+    x = "Month",
+    y = "Number of Car Thefts"
+  ) +
+  theme_minimal()
+
+```
+
+### Task 6: Describe the confidence interval.
+
+- What does the 95% confidence interval show here?
+- What figure(s) accurately reflects the number of car thefts in a typical month?
+- Propose a headline about the trend in car thefts that is focused on the present and future, but informed by the data you see above.
+
+PUT YOUR ANSWERS HERE.
+
+
+### Task 7: Is the recent trend significant?
+
+It _looks_ like car thefts are decreasing lately. But is that change real? We'll split the monthly data into two halves, and then ask if whether there's a statistically significant difference between these periods. To do that, we'll use a t-test with our alpha at 0.05 and develop a null hypothesis and an alternative hypothesis for this scenario.
+
+Null Hypothesis: there is no real difference between the two periods
+Alternative Hypothesis: there is a real difference between the two periods
+
+```{r}
+
+# Find the halfway point and add a column placing each month in the first or second halves
+
+midpoint <- ceiling(nrow(car_thefts) / 2)
+car_thefts <- car_thefts |> 
+  mutate(period = if_else(row_number() <= midpoint, "First Half", "Second Half"))
+
+# Perform t-test comparing the two time periods - this is a two-sided test because we have two periods
+t_test_periods <- t.test(total ~ period, data = car_thefts)
+
+# Display results
+t_test_periods
+
+# Visualize the comparison
+period_summary <- car_thefts |> 
+  group_by(period) |> 
+  summarize(
+    mean_thefts = mean(REPLACE_ME),
+    sd_thefts = sd(total),
+    months = n(),
+    se_thefts = sd_thefts / sqrt(months),
+    margin_error = qt(0.975, df = REPLACE_ME - 1) * se_thefts, # look at how we calculated this above
+    ci_lower = mean_thefts - margin_error,
+    ci_upper = mean_thefts + margin_error
+  )
+
+period_summary |> 
+ggplot(aes(x = period, y = mean_thefts, fill = period)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  geom_text(aes(label = round(mean_thefts, 1)), vjust = -0.5, size = 4) +
+  labs(
+    title = "Comparing Car Thefts: First Half vs. Second Half of Data Period",
+    subtitle = paste0("p-value = ", round(t_test_periods$p.value, 3)),
+    x = "Time Period",
+    y = "Average Number of Car Thefts"
+  ) +
+  scale_fill_manual(values = c("First Half" = "#66c2a5", "Second Half" = "#fc8d62")) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+### Task 8: Reflection
+
+Given the above chart, is the difference between the two periods statistically significant? Can we reject the null hypothesis?
+
+How would you revise your headline from Task 6, if at all? What would you tell your editor, and what would you expect her to ask you?
+
+PUT ANSWERS HERE
+
+
+
+When you are finished, add, commit and push your notebook and submit the URL in ELMS.
