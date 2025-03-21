@@ -2,7 +2,9 @@
 title: "Car Thefts Significance"
 ---
 
-Working in pairs, follow along with the demo to learn how to use confidence intervals and t.tests to determine statistical significance. Provide answers in this notebook when prompted. Get started by loading the tidyverse in a new R block.
+Your editor wants to know if changes in monthly car thefts in Prince George's County are worth a story. One way to tell: if the changes are statistically significant or just random noise. Unlike previous assignments, this one has some code already written and asks for responses after certain steps. 
+
+Provide code and answers in this notebook when prompted, and run each block. Get started by loading the tidyverse in a new R block.
 
 ### Task 1: Load the tidyverse
 
@@ -26,7 +28,7 @@ glimpse(car_thefts)
 
 ### Task 3: Let's make a chart and describe the results.
 
-We'll make a line chart using geom_line() to try and illustrate any trend over time. Working in pairs, discuss how you would respond if your editor asked you what you think is going on with car thefts in Prince George's County.
+We'll make a line chart using geom_line() to try and illustrate any trend over time. Based in this chart, how you would respond if your editor asked you what you think is going on with car thefts in Prince George's County.
 
 PUT ANSWERS HERE.
 
@@ -51,18 +53,18 @@ ggplot(car_thefts, aes(x = month, y = total)) +
 
 ### Task 4: Add the mean, standard error and calculate a confidence interval
 
-Let's add some stats to that process - mean and standard deviation - and calculate the standard error and 95% confidence intervals.
+Let's add some stats to that process - mean and standard deviation - and calculate the standard error and 95% confidence interval, and show the upper and lower boundaries of that confidence interval.
 
 ```{r}
 
 theft_summary <- car_thefts |> 
   summarize(
-    mean_thefts = mean(total),
-    sd_thefts = sd(total),
-    months = n(),
-    se_thefts = sd_thefts / sqrt(months),
-    margin_error = qt(0.975, df = months - 1) * se_thefts,  # Using t-distribution for small sample
-    ci_lower = mean_thefts - margin_error,
+    mean_thefts = mean(total), # mean
+    sd_thefts = sd(total), # standard deviation
+    months = n(), # total number of months
+    se_thefts = sd_thefts / sqrt(months), # standard error of our data
+    margin_error = qt(0.975, df = months - 1) * se_thefts,  # calculate margin of error using 
+    ci_lower = mean_thefts - margin_error, # lower boundary of confidence interval
     ci_upper = mean_thefts + margin_error
   )
 
