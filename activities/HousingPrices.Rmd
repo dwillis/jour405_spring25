@@ -1,33 +1,34 @@
 ---
-title: "Home Values After Transit Line Extension"
+title: "Home Values After Transit Line"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(scipen=999)
 library(tidyverse)
-library(scales)
 ```
 
-## The News Story Challenge
+## Measuring the Impact of Transit on Housing Prices
 
-Local officials have claimed that the new light rail line has increased property values in a local neighborhood.
+Local officials have claimed that a new light rail line has increased property values in a local neighborhood.
 
 Before the transit line opened, homes in that neighborhood sold for an average of $285,000, with a standard deviation of $32,000.
 
 Since the extension opened, your news team collected sales data from 14 recent home sales in the neighborhood:
 $297,000, $305,000, $292,000, $318,000, $290,000, $311,000, $299,000, $325,000, $302,000, $288,000, $307,000, $315,000, $320,000, $294,000
 
-As a journalist, you need to determine: **Is there statistical evidence that the transit extension has actually increased home values?**
+As a journalist, you need to determine: **Is there statistical evidence that the transit line has actually increased home values?**
+
+Follow along, running the code when directed. If you have questions, ask either in class or put them just below the section you have a question about.
 
 ## Task 1: Organize your data
 
 ```{r}
-# Known information about home values before the transit extension
+# Known information about home values before the transit line
 prior_mean <- 285000  # average home value
 prior_sd <- 32000     # standard deviation
 
-# Home sale prices after the transit extension opened (14 homes)
+# Home sale prices after the transit line opened (14 homes)
 new_prices <- c(297000, 305000, 292000, 318000, 290000, 311000, 299000, 
                 325000, 302000, 288000, 307000, 315000, 320000, 294000)
 
@@ -45,7 +46,7 @@ home_data
 
 ```{r}
 # Calculate statistics on the new home price data
-new_stats <- home_data %>%
+new_stats <- home_data |> 
   summarise(
     mean = mean(sale_price),
     sd = sd(sale_price),
@@ -73,7 +74,7 @@ ggplot(home_data, aes(x = reorder(sale_id, sale_price), y = sale_price)) +
            label = "Previous Average ($285K)", hjust = 0, fontface = "bold", color = "darkred") +
   scale_y_continuous(labels = dollar_format) +
   labs(
-    title = "Oak Hill Home Sales After Transit Extension",
+    title = "Home Sales After Transit Line",
     subtitle = "Horizontal line shows previous neighborhood average of $285,000",
     x = "Recent Home Sales",
     y = "Sale Price",
@@ -93,8 +94,8 @@ ggplot(home_data, aes(x = reorder(sale_id, sale_price), y = sale_price)) +
 This is where we formally test the officials' claim that the transit line has increased home values.
 
 **Hypotheses:**
-- H₀: μ ≤ $285,000 (The transit extension has not increased home values)
-- H₁: μ > $285,000 (The transit extension has increased home values)
+- H₀: μ ≤ $285,000 (The transit line has not increased home values)
+- H₁: μ > $285,000 (The transit line has increased home values)
 
 ```{r}
 # Perform a one-sample t-test
@@ -109,11 +110,24 @@ t_test_result <- t.test(
 t_test_result
 ```
 
-## Step 5: Interpreting the results for your news story
+## Task 5: Interpreting the results for your story
 
 ```{r}
 # Extract the p-value
 p_value <- t_test_result$p.value
+
+# Calculate the 95% confidence interval
+ci <- t.test(home_data$sale_price)$conf.int
+
+# Format and display the confidence interval in a readable way
+ci_formatted <- tibble(
+  `Lower bound` = dollar_format(ci[1]),
+  `Upper bound` = dollar_format(ci[2]),
+  `Confidence level` = "95%"
+)
+
+# Display as a nice table
+ci_formatted
 
 # Set our significance level
 alpha <- 0.05
@@ -131,18 +145,18 @@ story_stats <- tibble(
   `New average` = dollar_format(mean(new_prices)),
   `Increase` = dollar_format(mean(new_prices) - prior_mean),
   `Percent change` = paste0(round(((mean(new_prices) - prior_mean) / prior_mean) * 100, 1), "%"),
-  `p-value` = round(p_value, 3),
+  `p-value` = p_value,
   `Statistically significant?` = if_else(p_value < alpha, "Yes", "No")
 )
 
 # Display the key statistics
 story_stats
+
+print(conclusion)
+
 ```
 
-## Conclusion
+## Task 6: What's the story?
 
-```{r, echo=FALSE}
-# Calculate the 95% confidence interval for the mean increase
-ci <- t.test(home_data$sale_price)$conf.int
-```
+After disucssion the results, each person writes a couple of sentences for the top of a story about local officials' claims on the impact of the transit line and what the data says. Remember that there are lots of possible reasons that could influence the price of a home. Make your sentences newsy.
 
