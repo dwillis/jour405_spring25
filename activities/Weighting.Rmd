@@ -4,8 +4,12 @@ date: "2025-04-01"
 ---
 
 ```{r setup, include=FALSE}
+library(knitr)
+install.packages("kableExtra")
+library(kableExtra)
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
+
 ```
 
 # Introduction
@@ -99,6 +103,7 @@ ggplot(nonvoters_data, aes(x = weight)) +
 First, let's look at how many people fall into each voting category in our sample.
 
 ```{r voter-categories}
+library(knitr)
 # Count of respondents by voter category
 nonvoters_data |>
   count(voter_category) |>
@@ -221,7 +226,7 @@ kable(comparison, digits = 1, caption = "Difference Between Weighted and Unweigh
 **Explanation:**
 - This table shows how many percentage points the results changed after applying weights
 - Positive numbers mean the weighted percentage is higher; negative numbers mean it's lower
-- For example, after weighting, the percentage of "rarely/never" voters saying "Yes" decreased by 3.7 percentage points
+- For example, after weighting, the percentage of "rarely/never" voters saying "Yes" decreased by 3.6 percentage points
 - These differences might seem small, but in a close election, even small shifts can be meaningful for reporting
 
 **Answer These Questions:**
