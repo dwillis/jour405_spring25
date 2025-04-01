@@ -86,9 +86,12 @@ ggplot(nonvoters_data, aes(x = weight)) +
 - Weights below 1.0 mean a respondent is overrepresented (counts as less than one person)
 - Weights above 1.0 mean a respondent is underrepresented (counts as more than one person)
 
-**Discussion Questions:**
+**Questions:**
+
 1. What is the range of weights in this dataset?
+
 2. What does it mean when a respondent has a weight of 0.23? What about 3.04?
+
 3. Why might some respondents be weighted more heavily than others?
 
 # Exercise 1: Voter Categories and Weighting
@@ -221,7 +224,10 @@ kable(comparison, digits = 1, caption = "Difference Between Weighted and Unweigh
 - For example, after weighting, the percentage of "rarely/never" voters saying "Yes" decreased by 3.7 percentage points
 - These differences might seem small, but in a close election, even small shifts can be meaningful for reporting
 
-**Analysis Questions:**
+**Answer These Questions:**
+
 1. Which voter category shows the biggest difference between weighted and unweighted results?
+
 2. How might these differences affect reporting on likely voter turnout?
+
 3. Why do you think these differences exist? What does this tell us about who might be over or under-represented in the sample?
