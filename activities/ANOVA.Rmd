@@ -1,0 +1,119 @@
+---
+title: "ANOVA for Journalists: Analyzing College Admissions Test Scores"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Introduction
+
+In this exercise, we'll explore a common journalism question: *Are there significant differences in standardized test scores across different types of colleges?*
+
+We'll use ANOVA (Analysis of Variance) to determine if the observed differences in SAT scores across three college types (Public, Private, and Community College) represent real patterns or just random variation.
+
+## Task 1: Load Libraries and Create Sample Data
+
+```{r}
+library(tidyverse)
+```
+
+```{r create-data}
+# Set seed for reproducibility
+set.seed(123)
+
+# Create simulated SAT scores for admitted students across three college types
+# Scale is 400-1600 for total SAT
+public_college <- rnorm(100, mean = 1350, sd = 120)
+private_college <- rnorm(100, mean = 1450, sd = 100)
+community_college <- rnorm(100, mean = 1050, sd = 150)
+
+# Combine into a single dataframe
+admissions_data <- data.frame(
+  college_type = factor(rep(c("Public", "Private", "Community"), each = 100)),
+  sat_score = c(public_college, private_college, community_college)
+)
+
+# Ensure SAT scores are within realistic range (400-1600)
+admissions_data$sat_score <- pmin(pmax(admissions_data$sat_score, 400), 1600)
+
+# Quick look at the data
+head(admissions_data)
+```
+
+## Task 2: Calculate Basic Statistics
+
+```{r summary-stats}
+# Summary statistics by college type
+admission_summary <- admissions_data |>
+  group_by(college_type) |>
+  summarize(
+    mean_score = mean(sat_score),
+    median_score = median(sat_score),
+    sd_score = sd(sat_score),
+    min_score = min(sat_score),
+    max_score = max(sat_score)
+  )
+
+print(admission_summary)
+```
+
+## Task 3: Visualize the Data
+
+Let's create visualizations to see the patterns:
+
+```{r visualize-distributions}
+# Create density plot showing overlapping distributions
+ggplot(admissions_data, aes(x = sat_score, fill = college_type)) +
+  geom_density(alpha = 0.5) +
+  labs(
+    title = "SAT Score Distributions by College Type",
+    subtitle = "Are these differences statistically significant?",
+    x = "SAT Score (400-1600 scale)",
+    y = "Density",
+    fill = "College Type"
+  ) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1")
+```
+
+```{r boxplot}
+# Create boxplot for another view
+ggplot(admissions_data, aes(x = college_type, y = sat_score, fill = college_type)) +
+  geom_boxplot() +
+  labs(
+    title = "SAT Scores by College Type",
+    x = "College Type",
+    y = "SAT Score"
+  ) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1")
+```
+
+## Task 4: Perform ANOVA Test
+
+```{r anova-test}
+# Run one-way ANOVA
+anova_result <- aov(sat_score ~ college_type, data = admissions_data)
+summary(anova_result)
+```
+
+## Task 5: Run Post-hoc Test
+
+```{r post-hoc}
+# Tukey's HSD test to see which specific pairs of college types differ
+tukey_result <- TukeyHSD(anova_result)
+print(tukey_result)
+```
+
+## Task 6: Report the Findings
+
+Based on our analysis, we can now answer:
+
+1. Is there a significant difference in SAT scores across college types?
+2. Which specific college types differ from each other?
+3. How large are these differences?
+
+Answer those questions, and write a headline and a lead paragraph reporting these findings.
+
+ANSWER HERE

@@ -1,0 +1,124 @@
+---
+title: "Chi-Square Test for Movie Ratings"
+---
+
+In this analysis, we will perform a chi-square test to determine if the observed movie rating frequencies are significantly different from the expected frequencies. We will use a hypothetical dataset of 400 movies and their corresponding ratings (1 star, 2 stars, 3 stars, 4 stars, and 5 stars).
+
+## Load Required Packages
+
+First, we need to load the necessary package for performing the chi-square test:
+
+```{r}
+install.packages("vcd")
+library(vcd)
+```
+
+### Expected Frequencies vs. Observed Frequencies
+
+In the chi-square test, we compare the observed frequencies of each category with the expected frequencies based on a hypothesized distribution or null hypothesis. The expected frequencies represent the frequencies we would expect to see if the null hypothesis is true, while the observed frequencies are the actual frequencies we obtain from our sample data.
+
+### Expected Frequencies
+
+The expected frequencies are calculated based on the sample size and the hypothesized probabilities or percentages for each category. In this movie ratings example, the expected frequencies are calculated by multiplying the total sample size (400 movies) by the expected percentage for each rating category:
+
+- 5 stars: 400 × 0.4 = 160
+- 4 stars: 400 × 0.3 = 120
+- 3 stars: 400 × 0.2 = 80
+- 2 stars: 400 × 0.05 = 20
+- 1 star: 400 × 0.05 = 20
+
+These expected frequencies represent the number of movies we would expect to see in each rating category if the null hypothesis (that the observed frequencies are consistent with the expected percentages) is true.
+
+### Observed Frequencies
+
+The observed frequencies are the actual counts of movies in each rating category from our sample data. In our example, the observed frequencies are:
+
+- 5 stars: 145
+- 4 stars: 128
+- 3 stars: 73
+- 2 stars: 32
+- 1 star: 22
+
+These observed frequencies may differ from the expected frequencies due to random variation or because the null hypothesis is not true (i.e., there are underlying factors influencing the movie rating distribution that are not accounted for in the expected percentages).
+
+### Data
+
+The data we will be using is as follows:
+
+```{r}
+movie_ratings <- data.frame(
+  Rating = c("5 stars", "4 stars", "3 stars", "2 stars", "1 star"),
+  Percentage = c(0.4, 0.3, 0.2, 0.05, 0.05),
+  `Sample Size` = 400,
+  `Expected Frequency` = c(160, 120, 80, 20, 20),
+  `Observed Frequency` = c(145, 128, 73, 32, 22)
+)
+
+movie_ratings
+```
+
+This data frame contains the following columns:
+
+Rating: The movie rating category (5 stars, 4 stars, 3 stars, 2 stars, 1 star)
+Percentage: The expected percentage of movies for each rating category
+Sample Size: The total number of movies in the sample (400)
+Expected Frequency: The expected number of movies for each rating category, based on the percentage and sample size
+Observed Frequency: The actual observed number of movies for each rating category
+
+### Chi-Square Test
+To perform the chi-square test, we will use the chisq.test() function from the vcd package:
+
+```{r}
+chisq_result <- chisq.test(movie_ratings$Observed.Frequency, p = movie_ratings$Percentage)
+chisq_result
+```
+
+The chisq.test() function takes two arguments:
+
+x: The observed frequency values (in our case, movie_ratings$Observed Frequency)
+p: The expected probability values (in our case, movie_ratings$Percentage)
+
+The output of the chisq.test() function provides the following information:
+
+The chi-square statistic, which is 9.9521
+The degrees of freedom (calculated as the number of categories - 1)
+The p-value for the test
+
+### Interpretation
+
+To interpret the results, we need to compare the chi-square statistic with the critical value from the chi-square distribution table or the qchisq() function:
+
+```{r}
+alpha <- 0.05
+df <- length(movie_ratings$Rating) - 1
+critical_value <- qchisq(alpha, df, lower.tail = FALSE)
+critical_value
+```
+
+In this case, we are using an alpha value of 0.05 and calculating the degrees of freedom as the number of rating categories (5) minus 1, which gives us 4 degrees of freedom. We need the right-tail critical value (lower.tail == FALSE) for the chi-square goodness of fit test.
+
+The critical value for the chi-square distribution with 4 degrees of freedom and an alpha of 0.05 is 9.487729.
+
+**Do we reject the null hypothesis?**
+
+In the chi-square test, we are testing the hypothesis that the observed frequencies are consistent with the expected frequencies (null hypothesis). The alternative hypothesis is that the observed frequencies are significantly different from the expected frequencies.
+
+The chi-square statistic measures the discrepancy between the observed and expected frequencies. If the discrepancy is large enough, we reject the null hypothesis and conclude that the observed frequencies are significantly different from the expected frequencies.
+
+The critical value is used to determine whether the chi-square statistic is large enough to reject the null hypothesis. The critical value is the value of the chi-square distribution that corresponds to a specified significance level (alpha) and the appropriate degrees of freedom.
+
+For right-tailed tests, we use the right-tail critical value because we are interested in the area under the curve to the right of the critical value. This area represents the probability of obtaining a chi-square statistic as extreme or more extreme than the observed value, assuming the null hypothesis is true.
+
+If the calculated chi-square statistic is greater than the right-tail critical value, we reject the null hypothesis and conclude that the observed frequencies are significantly different from the expected frequencies.
+
+In contrast, for left-tailed tests, we would use the left-tail critical value because we would be interested in the area under the curve to the left of the critical value.
+
+By using the `qchisq(alpha, df, lower.tail = FALSE)` syntax in R, we are explicitly requesting the right-tail critical value for the chi-square distribution with the specified alpha level and degrees of freedom. This is the appropriate critical value to use for the chi-square test of independence or goodness-of-fit tests, which are right-tailed tests.
+
+### Conclusion
+
+Compare the chi-square statistic to the critical value, say whether you would accept or reject the null hypothesis and what that means.
+
+ANSWER HERE
+
+It is important to note that the chi-square test only determines if there is a significant difference between the observed and expected frequencies, but it does not provide information about the specific reasons for this difference. Further analysis and investigation would be required to understand the underlying factors contributing to the observed movie rating distribution.
