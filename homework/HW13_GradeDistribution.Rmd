@@ -1,0 +1,117 @@
+---
+title: "Chi-Square Test for College Letter Grades"
+---
+
+In this analysis, we will perform a chi-square test to determine if the observed frequencies of college letter grades are significantly different from the expected frequencies. We will use a hypothetical dataset of 400 students and their corresponding letter grades (A, B, C, D, and F). Your new friend REPLACE_ME is back again; replace those with the appropriate values.
+
+## Load Required Packages
+
+First, we need to load the necessary package for performing the chi-square test:
+
+```{r}
+library(vcd)
+```
+
+### Expected Frequencies vs. Observed Frequencies
+In the chi-square test, we compare the observed frequencies of each category with the expected frequencies based on a hypothesized distribution or null hypothesis. The expected frequencies represent the frequencies we would expect to see if the null hypothesis is true, while the observed frequencies are the actual frequencies we obtain from our sample data.
+
+### Expected Frequencies
+
+The expected frequencies are calculated based on the sample size and the hypothesized probabilities or percentages for each category. In this example, the expected frequencies are calculated by multiplying the total sample size (400 students) by the expected percentage for each grade category:
+
+A: 400 × 0.2 = 80
+B: 400 × 0.3 = 120
+C: 400 × 0.3 = 120
+D: 400 × 0.1 = 40
+F: 400 × 0.1 = 40
+
+These expected frequencies represent the number of students we would expect to see in each grade category if the null hypothesis (that the observed frequencies are consistent with the expected percentages) is true.
+
+### Observed Frequencies
+
+The observed frequencies are the actual counts of students in each grade category from our sample data. In our example, the observed frequencies are:
+
+A: 100
+B: 125
+C: 100
+D: 45
+F: 30
+
+These observed frequencies may differ from the expected frequencies due to random variation or because the null hypothesis is not true (there are other factors influencing the grade distribution that are not accounted for in the expected percentages).
+
+### Data
+
+The data we will be using is as follows:
+
+```{r}
+grade_data <- data.frame(
+  Grade = c("A", "B", "C", "D", "F"),
+  Percentage = c(0.2, 0.3, 0.3, 0.1, 0.1),
+  Sample_Size = 400,
+  Expected_Frequency = c(80, 120, 120, 40, 40),
+  Observed_Frequency = c(100, 125, 100, 45, 30)
+)
+
+grade_data
+```
+
+This data frame contains the following columns:
+
+Grade: The letter grade category (A, B, C, D, F)
+Percentage: The expected percentage of students for each grade category
+Sample Size: The total number of students in the sample (200)
+Expected Frequency: The expected number of students for each grade category, based on the percentage and sample size
+Observed Frequency: The actual observed number of students for each grade category
+
+**Task 1** 
+
+Looking at the grade_data broadly, do you think that the differences between the expected and observed frequencies are meaningful? Why or why not?
+
+ANSWER HERE
+
+
+### Chi-Square Test
+To perform the chi-square test, we will use the chisq.test() function from the vcd package. 
+
+```{r}
+chisq_result <- chisq.test(REPLACE_ME, p = REPLACE_ME)
+chisq_result
+```
+
+The chisq.test() function takes two arguments:
+
+x: The observed frequency values 
+p: The expected probability values
+
+The output of the chisq.test() function provides the following information:
+
+The chi-square statistic
+The degrees of freedom (calculated as the number of categories - 1)
+The p-value for the test
+
+### Interpretation
+
+**Task 2**
+
+To interpret the results, we need to compare the chi-square statistic with the critical value from the chi-square distribution table or the qchisq() function. Using the in-class activity as a guide, replace the values below. Remember, degrees of freedom are calculated as the number of categories minus one. 
+
+```{r}
+alpha <- 0.05
+df <- length(REPLACE_ME) - REPLACE_ME
+critical_value <- qchisq(alpha, df, lower.tail = FALSE)
+critical_value
+```
+
+
+**Task 3**
+
+If the chi-square statistic is greater than the critical value, we reject the null hypothesis at the 0.05 alpha level. Do we?
+
+ANSWER HERE
+
+
+**Task 4**
+
+Describe the differences in the expected and observed frequencies for each grade category. Are there any notable discrepancies? What questions would you ask either the instructor or college about these discrepancies?
+
+ANSWER HERE
