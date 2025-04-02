@@ -1,0 +1,187 @@
+---
+title: "Prince George's County Car Theft Spike Analysis"
+author: "Your Name"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      fig.width = 10, fig.height = 6)
+```
+
+## Introduction
+
+This analysis examines the impact of a significant spike in car theft rates in 2023 in Prince George's County, and whether that spike has led to a sustained higher rate of car theft in the county. We'll use Analysis of Variance (ANOVA) to determine if theft rates differ significantly between pre-spike (before 2023), spike (2023), and post-spike (2024-present) periods.
+
+## Data Preparation and Exploration
+
+### Loading Libraries and Data
+
+```{r load-libraries}
+# Load required libraries
+library(tidyverse)
+library(lubridate)
+```
+
+```{r load-data}
+# Import data
+theft_data <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/car_thefts_month17_25.csv")
+
+# Look at the first few rows
+head(theft_data)
+
+# Get a summary of the data
+summary(theft_data)
+```
+
+
+### Get the data how we want it and calculate the rates
+
+```{r process-data}
+# Calculate theft rate and create time period variable
+theft_data <- theft_data |>
+  mutate(
+    date = as.Date(month),
+    year = year(date),
+    month_number = month(date),
+    theft_rate = (total / population) * 100000,
+    time_period = case_when(
+      year < 2023 ~ "Pre-spike",
+      year == 2023 ~ "Spike year",
+      year > 2023 ~ "Post-spike"
+    )
+  )
+
+# Create summary by time period
+period_summary <- theft_data |>
+  group_by(time_period) |>
+  summarize(
+    mean_thefts = mean(total),
+    mean_rate = mean(theft_rate),
+    median_rate = median(theft_rate),
+    sd_rate = sd(theft_rate),
+    n = n(),
+    .groups = "drop"
+  )
+
+# Display the summary
+knitr::kable(period_summary, digits = 2,
+             caption = "Summary of Car Theft Rates by Time Period")
+```
+
+## Visualizing the Spike Pattern
+
+### Time Series Plot
+
+```{r time-series}
+# Time series plot showing the spike pattern
+ggplot(theft_data, aes(x = date, y = theft_rate)) +
+  geom_line() +
+  geom_smooth(method = "loess", span = 0.2) +
+  geom_vline(xintercept = as.Date("2023-01-01"), linetype = "dashed", color = "red") +
+  geom_vline(xintercept = as.Date("2024-01-01"), linetype = "dashed", color = "red") +
+  annotate("text", x = as.Date("2023-07-01"), y = max(theft_data$theft_rate) * 0.9, 
+           label = "Spike Year", color = "red") +
+  labs(title = "Monthly Car Theft Rates (2017-2025) with Spike Highlighted",
+       x = "Date", y = "Thefts per 100,000 Population") +
+  theme_minimal()
+```
+
+**Task 1** Describe the output of this chart and then give it a better, more active title that provides the lede:
+
+ANSWER HERE
+
+
+Now let's take a look at average theft rates.
+
+### Yearly Average Theft Rates
+
+```{r yearly-means}
+# Calculate yearly means
+yearly_means <- theft_data |>
+  group_by(year) |>
+  summarize(
+    mean_rate = mean(theft_rate),
+    .groups = "drop"
+  )
+
+# Plot yearly means
+ggplot(yearly_means, aes(x = year, y = mean_rate)) +
+  geom_line(size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_point(data = yearly_means |> filter(year == 2023), 
+             aes(x = year, y = mean_rate), size = 4, color = "red") +
+  labs(title = "Average Annual Car Theft Rates",
+       x = "Year", y = "Average Thefts per 100,000 Population") +
+  theme_minimal() +
+  scale_x_continuous(breaks = 2017:2025)
+```
+
+## One-way ANOVA Analysis
+
+### Hypothesis Formulation
+
+For our ANOVA test, we'll compare the mean theft rates between the three time periods. First we need to create our hypotheses.
+
+**Task 2** Fill in the hypotheses
+
+- **Null Hypothesis (H0)**: ANSWER HERE
+
+- **Alternative Hypothesis (H1)**: ANSWER HERE
+
+### One-way ANOVA Test
+
+```{r anova-test}
+# Perform one-way ANOVA on theft rates by time period
+period_anova <- aov(theft_rate ~ time_period, data = theft_data)
+summary(period_anova)
+```
+
+**Task 3** Describe the result: are there real differences in the average rates between the time periods? Is this result significant?
+
+ANSWER HERE
+
+## Compare the differences between specific periods
+
+Run our post-anova Tukey test and examine the results. 
+
+```{r posthoc}
+# Tukey's HSD test
+tukey_results <- TukeyHSD(period_anova)
+print(tukey_results)
+```
+
+
+```{r period-means}
+# Visualize time period means with confidence intervals
+period_rates <- theft_data |>
+  group_by(time_period) |>
+  summarize(
+    mean_rate = mean(theft_rate),
+    se = sd(theft_rate) / sqrt(n()),
+    .groups = "drop"
+  ) |>
+  mutate(
+    lower_ci = mean_rate - qt(0.975, n() - 1) * se,
+    upper_ci = mean_rate + qt(0.975, n() - 1) * se
+  )
+
+# Ensure time period is ordered correctly
+period_rates$time_period <- factor(period_rates$time_period, 
+                                   levels = c("Pre-spike", "Spike year", "Post-spike"))
+
+ggplot(period_rates, aes(x = time_period, y = mean_rate, fill = time_period)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2) +
+  labs(title = "Car Theft Rates by Time Period with 95% Confidence Intervals",
+       x = "", y = "Mean Theft Rate per 100,000") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Conclusion
+
+This analysis has examined whether there are significant differences in car theft rates between the pre-spike period (before 2023), the spike year (2023), and the post-spike period (after 2023).
+
+**Task 4** Describe the results of the Tukey's test and chart showing confidence intervals. Is there a significant difference between the three periods? In particular, is the difference between the pre-spike and post-spike periods real and significant? Write a headline and lede reporting these findings, focusing on the pre- and post-spike periods.
+
+ANSWER HERE

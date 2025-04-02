@@ -98,13 +98,23 @@ anova_result <- aov(sat_score ~ college_type, data = admissions_data)
 summary(anova_result)
 ```
 
-## Task 5: Run Post-hoc Test
+The F-value is huge (284.3). The F-value measures the ratio of between-group variance to within-group variance, and this high value suggests the differences between college types far outweigh the variation within each type. The p-value is very low, indicating the differences between college types are statistically significant at any reasonable significance level. The three asterisks (***) highlight that this is significant at the 0.001 level. So we can say that with confidence that there are real differences in SAT scores between the three types of colleges.
+
+## Task 5: Compare the differences between specific pairs
 
 ```{r post-hoc}
 # Tukey's HSD test to see which specific pairs of college types differ
 tukey_result <- TukeyHSD(anova_result)
 print(tukey_result)
 ```
+
+The Tukey multiple comparisons test shows highly significant differences in SAT scores between all college types:
+
+* Private vs. Community: Private colleges have SAT scores that are 366.96 points higher than community colleges on average (p < 0.0001)
+* Public vs. Community: Public colleges have SAT scores that are 292.55 points higher than community colleges on average (p < 0.0001)
+* Public vs. Private: Public colleges have SAT scores that are 74.40 points lower than private colleges on average (p = 0.000021)
+
+All comparisons show extremely small p-values, indicating these differences are statistically significant at any conventional significance level. The 95% confidence intervals (shown in the "lwr" and "upr" columns) do not include zero for any comparison, further confirming these differences are statistically significant.
 
 ## Task 6: Report the Findings
 
