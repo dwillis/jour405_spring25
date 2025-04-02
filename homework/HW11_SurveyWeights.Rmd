@@ -4,6 +4,7 @@ author: "Your Name Here"
 ---
 
 ```{r setup, include=FALSE}
+library(kableExtra)
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
 ```
