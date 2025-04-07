@@ -63,15 +63,15 @@ Sample Size: The total number of students in the sample (200)
 Expected Frequency: The expected number of students for each grade category, based on the percentage and sample size
 Observed Frequency: The actual observed number of students for each grade category
 
-**Task 1** 
-
-Looking at the grade_data broadly, do you think that the differences between the expected and observed frequencies are meaningful? Why or why not?
+**Task 1** Looking at the grade_data broadly, do you think that the differences between the expected and observed frequencies are meaningful? Why or why not? (3 points)
 
 ANSWER HERE
 
 
 ### Chi-Square Test
 To perform the chi-square test, we will use the chisq.test() function from the vcd package. 
+
+**Task 2** Replace the REPLACE_ME with the appropriate variable or value (2 points)
 
 ```{r}
 chisq_result <- chisq.test(REPLACE_ME, p = REPLACE_ME)
@@ -91,9 +91,9 @@ The p-value for the test
 
 ### Interpretation
 
-**Task 2**
-
 To interpret the results, we need to compare the chi-square statistic with the critical value from the chi-square distribution table or the qchisq() function. Using the in-class activity as a guide, replace the values below. Remember, degrees of freedom are calculated as the number of categories minus one. 
+
+**Task 3** Replace the REPLACE_ME with the appropriate values (2 points)
 
 ```{r}
 alpha <- 0.05
@@ -103,15 +103,11 @@ critical_value
 ```
 
 
-**Task 3**
-
-If the chi-square statistic is greater than the critical value, we reject the null hypothesis at the 0.05 alpha level. Do we?
+**Task 3** If the chi-square statistic is greater than the critical value, we reject the null hypothesis at the 0.05 alpha level. Do we? (3 points)
 
 ANSWER HERE
 
 
-**Task 4**
-
-Describe the differences in the expected and observed frequencies for each grade category. Are there any notable discrepancies? What questions would you ask either the instructor or college about these discrepancies?
+**Task 4** Describe the differences in the expected and observed frequencies for each grade category. Are there any notable discrepancies? What questions would you ask either the instructor or college about these discrepancies? (5 points)
 
 ANSWER HERE
