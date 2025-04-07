@@ -36,6 +36,8 @@ summary(theft_data)
 
 ### Get the data how we want it and calculate the rates
 
+**Task 1** Replace REPLACE_ME with the variables you need to calculate the theft_rate (2 points)
+
 ```{r process-data}
 # Calculate theft rate and create time period variable
 theft_data <- theft_data |>
@@ -43,7 +45,7 @@ theft_data <- theft_data |>
     date = as.Date(month),
     year = year(date),
     month_number = month(date),
-    theft_rate = (total / population) * 100000,
+    theft_rate = (REPLACE_ME / REPLACE_ME) * 100000,
     time_period = case_when(
       year < 2023 ~ "Pre-spike",
       year == 2023 ~ "Spike year",
@@ -68,6 +70,10 @@ knitr::kable(period_summary, digits = 2,
              caption = "Summary of Car Theft Rates by Time Period")
 ```
 
+**Task 2** Describe the results of calculating the rates for each period. What do they suggest? (3 points)
+
+ANSWER_HERE
+
 ## Visualizing the Spike Pattern
 
 ### Time Series Plot
@@ -86,7 +92,7 @@ ggplot(theft_data, aes(x = date, y = theft_rate)) +
   theme_minimal()
 ```
 
-**Task 1** Describe the output of this chart and then give it a better, more active title that provides the lede:
+**Task 3** Describe the output of this chart and then give it a better, more active title that provides the lede (3 points)
 
 ANSWER HERE
 
@@ -122,7 +128,7 @@ ggplot(yearly_means, aes(x = year, y = mean_rate)) +
 
 For our ANOVA test, we'll compare the mean theft rates between the three time periods. First we need to create our hypotheses.
 
-**Task 2** Fill in the hypotheses
+**Task 4** Fill in the hypotheses (2 points)
 
 - **Null Hypothesis (H0)**: ANSWER HERE
 
@@ -136,7 +142,7 @@ period_anova <- aov(theft_rate ~ time_period, data = theft_data)
 summary(period_anova)
 ```
 
-**Task 3** Describe the result: are there real differences in the average rates between the time periods? Is this result significant?
+**Task 5** Describe the result: are there real differences in the average rates between the time periods? Is this result significant? (5 points)
 
 ANSWER HERE
 
@@ -182,6 +188,6 @@ ggplot(period_rates, aes(x = time_period, y = mean_rate, fill = time_period)) +
 
 This analysis has examined whether there are significant differences in car theft rates between the pre-spike period (before 2023), the spike year (2023), and the post-spike period (after 2023).
 
-**Task 4** Describe the results of the Tukey's test and chart showing confidence intervals. Is there a significant difference between the three periods? In particular, is the difference between the pre-spike and post-spike periods real and significant? Write a headline and lede reporting these findings, focusing on the pre- and post-spike periods.
+**Task 6** Describe the results of the Tukey's test and chart showing confidence intervals. Is there a significant difference between the three periods? In particular, is the difference between the pre-spike and post-spike periods real and significant? Write a headline and lede reporting these findings, focusing on the pre- and post-spike periods. (5 points)
 
 ANSWER HERE
