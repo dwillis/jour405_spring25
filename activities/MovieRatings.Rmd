@@ -41,7 +41,7 @@ The observed frequencies are the actual counts of movies in each rating category
 
 These observed frequencies may differ from the expected frequencies due to random variation or because the null hypothesis is not true (i.e., there are underlying factors influencing the movie rating distribution that are not accounted for in the expected percentages).
 
-### Data
+### Setup the Data
 
 The data we will be using is as follows:
 
@@ -65,7 +65,12 @@ Sample Size: The total number of movies in the sample (400)
 Expected Frequency: The expected number of movies for each rating category, based on the percentage and sample size
 Observed Frequency: The actual observed number of movies for each rating category
 
-### Chi-Square Test
+**Task 1** Describe the data
+
+Based on just looking at the expected and observed data, is the latter set different than expected? How?
+
+
+### Task 2: Chi-Square Test
 To perform the chi-square test, we will use the chisq.test() function from the vcd package:
 
 ```{r}
@@ -86,7 +91,7 @@ The p-value for the test
 
 ### Interpretation
 
-To interpret the results, we need to compare the chi-square statistic with the critical value from the chi-square distribution table or the qchisq() function:
+To interpret the results, we need to compare the chi-square statistic with the critical value from the chi-square distribution table by using the qchisq() function:
 
 ```{r}
 alpha <- 0.05
