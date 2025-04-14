@@ -58,7 +58,13 @@ admission_summary <- admissions_data |>
 print(admission_summary)
 ```
 
-## Task 3: Visualize the Data
+**Task 3** Describe the data
+
+Write a couple of sentences describing the differences in SAT scores between types of colleges, using the descriptive statistics we just generated.
+
+
+
+## Task 4: Visualize the Data
 
 Let's create visualizations to see the patterns:
 
@@ -90,7 +96,7 @@ ggplot(admissions_data, aes(x = college_type, y = sat_score, fill = college_type
   scale_fill_brewer(palette = "Set1")
 ```
 
-## Task 4: Perform ANOVA Test
+## Task 5: Perform ANOVA Test
 
 ```{r anova-test}
 # Run one-way ANOVA
@@ -124,6 +130,6 @@ Based on our analysis, we can now answer:
 2. Which specific college types differ from each other?
 3. How large are these differences?
 
-Answer those questions, and write a headline and a lead paragraph reporting these findings.
+Answer those questions, providing evidence for your answers, and then write a headline and a lead paragraph reporting these findings using active voice and focusing on the differences across types.
 
-ANSWER HERE
+
