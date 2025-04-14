@@ -124,6 +124,6 @@ View(md_cities)
 
 ### Pitch a story (8 points)
 
-Given the data that you've produced here, write a headline and lede of the most interesting story from this exercise, and add below that details on how you would report it out: who you'd talk to and the questions you'd ask.
+Given the data that you've produced here, write a headline and lede of the most interesting story from this exercise, and add below that details on how you would report it out: who you'd talk to and the questions you'd ask. When you describe the Diversity Index values, do so in a similar way to how USA Today did; the raw values themselves won't mean much to readers.
 
 **ANSWER HERE**
