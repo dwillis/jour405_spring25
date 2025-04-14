@@ -1,0 +1,129 @@
+---
+title: "Diversity Index for Maryland Cities"
+author: "Your Name"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Overview
+
+In this exercise, we will calculate the **USA TODAY Diversity Index** for Maryland cities with a population of at least 10,000 using 2020 Census race and ethnicity data. The Diversity Index reflects the probability that two randomly selected individuals from a city are of different races or ethnicities.
+
+A score of 0 indicates no diversity (everyone is the same race/ethnicity), while a score closer to 100 indicates higher diversity. The **most diverse city** has the highest index, reflecting a balanced mix of several racial and ethnic groups. The **least diverse** city likely has one overwhelmingly dominant racial/ethnic group.
+
+## Task 1: Load and Describe the Data (3 points)
+
+Run the following code to load the data, then examine it and describe what it contains. Based on the raw numbers alone, which cities stand out as diverse to you?
+
+**ANSWER HERE**
+
+```{r load-data}
+md_cities <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/usat_diversity_index.csv")
+
+# Preview structure
+View(md_cities)
+```
+
+## Task 2: Calculate Race Percentages
+
+```{r race-percentages}
+md_cities <- md_cities |>
+  mutate(
+    White_pct = White / TotalPop,
+    Black_pct = Black / TotalPop,
+    Native_pct = Native / TotalPop,
+    Asian_pct = Asian / TotalPop,
+    NHPI_pct = NHPI / TotalPop
+  )
+```
+
+## Task 3: Square the Race Percentages
+
+We need to square the race percentages in order to calculate the probability that any two people chosen at random from a given census area are of different races or are Hispanic or not.
+
+```{r square-race}
+md_cities <- md_cities |>
+  mutate(
+    White_pct_sq = White_pct^2,
+    Black_pct_sq = Black_pct^2,
+    Native_pct_sq = Native_pct^2,
+    Asian_pct_sq = Asian_pct^2,
+    NHPI_pct_sq = NHPI_pct^2
+  )
+```
+
+
+## Task 4: Calculate Race Probabilities (3 points)
+
+The race probability is the sum the squared probabilities for each of the races. It represents the probability that two people randomly chosen from the same city will be of the same race. Which city has the highest race probability, and why do you think that is?
+
+**ANSWER HERE**
+
+```{r race-prob}
+md_cities <- md_cities |>
+  mutate(
+    Race_Prob = White_pct_sq + Black_pct_sq + Native_pct_sq + Asian_pct_sq + NHPI_pct_sq
+  ) |> 
+  arrange(desc(Race_Prob))
+
+View(md_cities)
+```
+
+
+## Task 5: Calculate Ethnicity Percentages and Their Squares (3 points)
+
+Hispanic origin is not a race but an ethnicity or nationality – and a separate Census question. The probability someone is Hispanic or not Hispanic must be calculated separately from race, and Hisp_Prob is the probability that two randomly selected people will be Hispanic or not. That's an important distinction, because unlike race probability, this measures the likelihood of a binary question: that both random people will be Hispanic. What do you notice about the cities with the *lowest* Hisp_Prob scores?
+
+**ANSWER HERE**
+
+```{r ethnicity}
+md_cities <- md_cities |>
+  mutate(
+    HispTotal = HISPANIC + NotHispanic,
+    Hisp_pct = HISPANIC / HispTotal,
+    NotHisp_pct = NotHispanic / HispTotal,
+    Hisp_pct_sq = Hisp_pct^2,
+    NotHisp_pct_sq = NotHisp_pct^2,
+    Hisp_Prob = Hisp_pct_sq + NotHisp_pct_sq
+  ) |> 
+  arrange(Hisp_Prob)
+
+View(md_cities)
+```
+
+## Task 6: Multiply Race and Ethnicity Probabilities
+
+Here we multiply the two probabilities together to get the probability that any two random people have the SAME race and ethnicity.
+
+```{r combined-prob}
+md_cities <- md_cities |>
+  mutate(
+    RaceEth_Prob = Race_Prob * Hisp_Prob
+  )
+```
+
+
+## Task 7: Calculate Diversity Index (3 points)
+
+The final step is to calculate the probability that two people randomly chosen WILL NOT BE OF THE SAME RACE OR ETHNICITY. In other words, the highest index scores will be cities where those two random people will be from different backgrounds. Put simply, more diverse. Which cities are the top 3, and where are they located? Look at the bottom of the list - which city is the least diverse, and where is it?
+
+**ANSWER HERE**
+
+```{r diversity-index}
+md_cities <- md_cities |>
+  mutate(
+    Diversity_Index = (1 - RaceEth_Prob) * 100
+  ) |> 
+  arrange(desc(Diversity_Index))
+
+View(md_cities)
+```
+
+### Pitch a story (8 points)
+
+Given the data that you've produced here, write a headline and lede of the most interesting story from this exercise, and add below that details on how you would report it out: who you'd talk to and the questions you'd ask.
+
+**ANSWER HERE**
