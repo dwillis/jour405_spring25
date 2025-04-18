@@ -1,6 +1,6 @@
 ---
-title: "Baltimore County 911 Calls Analysis"
-author: "Data Journalism Class"
+title: "Baltimore County 911 Overdose Calls Analysis"
+author: "YOUR NAME HERE"
 ---
 
 ```{r setup, include=FALSE}
