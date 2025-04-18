@@ -11,14 +11,14 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 ## Introduction
 
-In this analysis, we'll examine 911 call data from Baltimore County to identify unusually busy or quiet days using z-scores. By calculating the number of calls per day and analyzing their statistical distribution, we can determine which days experienced an abnormal volume of emergency calls - information that could lead to important journalistic insights about public safety patterns.
+In this analysis, we'll examine data on 911 drug overdose calls from Baltimore County to identify unusually busy or quiet days using z-scores. By calculating the number of calls per day and analyzing their statistical distribution, we can determine which days experienced an abnormal volume of emergency calls - information that could lead to potential story ideas.
 
 A z-score measures how many standard deviations a data point is from the mean. Generally:
 - Z-scores between -2 and 2 represent typical values (about 95% of the data)
 - Z-scores beyond ±2 indicate unusual values that warrant investigation
 - Z-scores beyond ±3 are very unusual (only about 0.3% of normally distributed data)
 
-## Setup and Data Loading
+## Task 1: Setup and Data Loading
 
 Let's start by loading the necessary packages and our dataset:
 
@@ -37,7 +37,7 @@ calls_data <- read_csv("https://raw.githubusercontent.com/dwillis/datajournalism
 head(calls_data)
 ```
 
-## Initial Data Exploration
+## Task 2: Initial Data Exploration
 
 Let's explore the basic structure and characteristics of our dataset:
 
@@ -53,30 +53,28 @@ min_date <- min(calls_data$date)
 max_date <- max(calls_data$date)
 cat("Data ranges from", min_date, "to", max_date)
 
-# Convert date to actual Date type if it's stored as string
-# This assumes date is in format "YYYY-MM-DD"
-calls_data <- calls_data %>%
-  mutate(date = as.Date(date))
 ```
 
-## Aggregating Calls by Day
+## Task 3: Aggregating Calls by Day (3 points)
 
-Now let's count how many 911 calls occurred on each day:
+Now let's count how many 911 overdose calls occurred on each day:
 
 ```{r aggregate-by-day}
 # Count calls per day
-daily_calls <- calls_data %>%
+daily_calls <- calls_data |>
   count(date, name = "call_count")
 
 # Display the first few days
-head(daily_calls, 10) %>%
+head(daily_calls, 10) |>
   kable()
 
 # Basic summary statistics for daily call volume
 summary(daily_calls$call_count)
 ```
 
-Let's visualize the time series of daily calls:
+Let's visualize the time series of daily calls. What patterns do you see? If you had to draw horizontal lines that would highlight unusual days, where would those lines be?
+
+ANSWER HERE
 
 ```{r daily-calls-plot}
 # Plot daily call volume
@@ -84,7 +82,7 @@ ggplot(daily_calls, aes(x = date, y = call_count)) +
   geom_line(color = "darkblue", alpha = 0.7) +
   geom_point(color = "darkblue", alpha = 0.5, size = 1) +
   theme_minimal() +
-  labs(title = "Daily 911 Calls in Baltimore County",
+  labs(title = "Daily 911 Overdose Calls in Baltimore County",
        x = "Date",
        y = "Number of Calls",
        caption = "Source: Baltimore County 911 Call Data") +
@@ -92,13 +90,16 @@ ggplot(daily_calls, aes(x = date, y = call_count)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-## Calculating Z-Scores for Daily Call Volume
+
+
+
+## Task 4: Calculating Z-Scores for Daily Call Volume
 
 Now, let's calculate z-scores to identify statistically unusual days:
 
 ```{r calculate-z-scores}
 # Calculate z-scores for daily call counts
-daily_calls <- daily_calls %>%
+daily_calls <- daily_calls |>
   mutate(
     mean_calls = mean(call_count),
     sd_calls = sd(call_count),
@@ -106,39 +107,41 @@ daily_calls <- daily_calls %>%
   )
 
 # Display the data with z-scores
-daily_calls %>%
-  select(date, call_count, z_score) %>%
-  head(10) %>%
+daily_calls |>
+  select(date, call_count, z_score) |>
+  head(10) |>
   kable(digits = 2)
 ```
 
-## Identifying Unusual Days
+## Task 5: Identifying Unusual Days (3 points)
 
 Let's identify days with unusually high or low call volumes (|z-score| > 2):
 
 ```{r identify-unusual-days}
 # Find days with unusual call volumes
-unusual_days <- daily_calls %>%
-  filter(abs(z_score) > 2) %>%
+unusual_days <- daily_calls |>
+  filter(abs(z_score) > 2) |>
   arrange(desc(abs(z_score)))
 
 # Display unusual days
-unusual_days %>%
-  select(date, call_count, z_score) %>%
+unusual_days |>
+  select(date, call_count, z_score) |>
   kable(digits = 2)
 
 # Count how many days were unusually busy vs. unusually quiet
-unusual_days %>%
-  group_by(unusual_type = if_else(z_score > 0, "Unusually High", "Unusually Low")) %>%
-  summarise(count = n()) %>%
+unusual_days |>
+  group_by(unusual_type = if_else(z_score > 0, "Unusually High", "Unusually Low")) |>
+  summarise(count = n()) |>
   kable()
 ```
 
-Let's visualize these unusual days in the context of the full dataset:
+Let's visualize these unusual days in the context of the full dataset. How do they differ from your answer on Task 3?
+
+ANSWER HERE
 
 ```{r plot-unusual-days}
 # Create a clean factor for the plot legend
-daily_calls <- daily_calls %>%
+daily_calls <- daily_calls |>
   mutate(call_volume_type = case_when(
     z_score > 2 ~ "Unusually High",
     z_score < -2 ~ "Unusually Low",
@@ -153,7 +156,7 @@ ggplot(daily_calls, aes(x = date, y = call_count, color = call_volume_type)) +
                                "Unusually High" = "red", 
                                "Unusually Low" = "blue")) +
   theme_minimal() +
-  labs(title = "Daily 911 Calls with Unusual Days Highlighted",
+  labs(title = "Daily 911 Overdose Calls with Unusual Days Highlighted",
        subtitle = "Unusual days have z-scores with absolute values > 2",
        x = "Date",
        y = "Number of Calls",
@@ -163,119 +166,87 @@ ggplot(daily_calls, aes(x = date, y = call_count, color = call_volume_type)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-## Day of Week Patterns
+## Task 6: Day of Week Patterns
 
 Let's also check if certain days of the week typically see more 911 calls:
 
 ```{r day-of-week-analysis}
 # Add day of week to our dataset
-daily_calls <- daily_calls %>%
+daily_calls <- daily_calls |>
   mutate(
     day_of_week = wday(date, label = TRUE)
   )
 
 # Calculate average calls by day of week
-dow_summary <- daily_calls %>%
-  group_by(day_of_week) %>%
+dow_summary <- daily_calls |>
+  group_by(day_of_week) |>
   summarise(
     avg_calls = mean(call_count),
     median_calls = median(call_count),
     min_calls = min(call_count),
     max_calls = max(call_count)
-  ) %>%
+  ) |>
   arrange(match(day_of_week, c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
 
 # Display summary by day of week
-dow_summary %>% kable(digits = 1)
+dow_summary |> kable(digits = 1)
 
 # Plot calls by day of week
 ggplot(dow_summary, aes(x = day_of_week, y = avg_calls)) +
   geom_col(fill = "steelblue") +
   geom_text(aes(label = round(avg_calls, 1)), vjust = -0.5) +
   theme_minimal() +
-  labs(title = "Average 911 Calls by Day of Week",
+  labs(title = "Average 911 Overdose Calls by Day of Week",
        x = "Day of Week",
        y = "Average Number of Calls",
        caption = "Source: Baltimore County 911 Call Data") +
   theme(axis.text.x = element_text(angle = 0))
 ```
 
-## Accounting for Day of Week Pattern
+## Task 7: Accounting for Day of Week Pattern (3 points)
 
-We can also calculate z-scores that account for the day of the week pattern:
+We can also calculate z-scores that account for the day of the week pattern. How would you describe the day with the highest z-score without using the term "z-score"?
+
+ANSWER HERE
 
 ```{r day-of-week-z-scores}
 # Calculate day-of-week adjusted z-scores
-daily_calls <- daily_calls %>%
-  group_by(day_of_week) %>%
+daily_calls <- daily_calls |>
+  group_by(day_of_week) |>
   mutate(
     dow_mean = mean(call_count),
     dow_sd = sd(call_count),
     dow_z_score = (call_count - dow_mean) / dow_sd
-  ) %>%
+  ) |>
   ungroup()
 
 # Find days that were unusual for their day of the week
-dow_unusual_days <- daily_calls %>%
-  filter(abs(dow_z_score) > 2) %>%
+dow_unusual_days <- daily_calls |>
+  filter(abs(dow_z_score) > 2) |>
   arrange(desc(abs(dow_z_score)))
 
 # Display days that were unusual for their day of the week
-dow_unusual_days %>%
-  select(date, day_of_week, call_count, dow_mean, dow_z_score) %>%
+dow_unusual_days |>
+  select(date, day_of_week, call_count, dow_mean, dow_z_score) |>
   kable(digits = 2)
 ```
 
-Let's compare our original unusual days with those that are unusual for their day of the week:
 
-```{r compare-unusual-methods}
-# Compare the two methods
-comparison <- daily_calls %>%
-  mutate(
-    unusual_overall = abs(z_score) > 2,
-    unusual_for_dow = abs(dow_z_score) > 2
-  ) %>%
-  filter(unusual_overall | unusual_for_dow) %>%
-  select(date, day_of_week, call_count, z_score, dow_z_score, unusual_overall, unusual_for_dow)
-
-# Display the comparison
-comparison %>% kable(digits = 2)
-
-# Count days that appear in both lists
-both_unusual <- comparison %>%
-  filter(unusual_overall & unusual_for_dow) %>%
-  nrow()
-
-# Count days only unusual overall
-only_unusual_overall <- comparison %>%
-  filter(unusual_overall & !unusual_for_dow) %>%
-  nrow()
-
-# Count days only unusual for their day of week
-only_unusual_dow <- comparison %>%
-  filter(!unusual_overall & unusual_for_dow) %>%
-  nrow()
-
-cat("Days unusual by both measures:", both_unusual, "\n",
-    "Days only unusual overall:", only_unusual_overall, "\n",
-    "Days only unusual for their day of week:", only_unusual_dow)
-```
-
-## Temporal Patterns and Trends
+## Task 8: Temporal Patterns and Trends
 
 Let's also look for seasonal patterns or trends over time:
 
 ```{r temporal-analysis}
 # Add month and year for seasonal analysis
-daily_calls <- daily_calls %>%
+daily_calls <- daily_calls |>
   mutate(
     month = month(date, label = TRUE),
     year = year(date)
   )
 
 # Calculate average calls by month
-monthly_summary <- daily_calls %>%
-  group_by(month) %>%
+monthly_summary <- daily_calls |>
+  group_by(month) |>
   summarise(
     avg_calls = mean(call_count),
     median_calls = median(call_count)
@@ -286,14 +257,14 @@ ggplot(monthly_summary, aes(x = month, y = avg_calls, group = 1)) +
   geom_line() +
   geom_point() +
   theme_minimal() +
-  labs(title = "Average 911 Calls by Month",
+  labs(title = "Average 911 Overdose Calls by Month",
        x = "Month",
        y = "Average Number of Calls",
        caption = "Source: Baltimore County 911 Call Data")
 
 # Show a rolling 7-day average to better see trends
-daily_calls <- daily_calls %>%
-  arrange(date) %>%
+daily_calls <- daily_calls |>
+  arrange(date) |>
   mutate(rolling_avg_7day = zoo::rollmean(call_count, k = 7, fill = NA))
 
 # Plot with 7-day rolling average
@@ -301,31 +272,31 @@ ggplot(daily_calls, aes(x = date)) +
   geom_line(aes(y = call_count), color = "gray60", alpha = 0.7) +
   geom_line(aes(y = rolling_avg_7day), color = "blue", size = 1) +
   theme_minimal() +
-  labs(title = "Daily 911 Calls with 7-Day Moving Average",
+  labs(title = "Daily 911 Overdose Calls with 7-Day Moving Average",
        x = "Date",
        y = "Number of Calls",
        caption = "Source: Baltimore County 911 Call Data") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-## Weather Events and Holidays
+## Task 9: T Most Unusual Days
 
 For the most unusual days, we might want to check if they coincide with significant events:
 
 ```{r investigate-top-outliers}
 # Get the top 10 most unusual days
-top_outliers <- daily_calls %>%
-  arrange(desc(abs(z_score))) %>%
-  head(10) %>%
+top_outliers <- daily_calls |>
+  arrange(desc(abs(z_score))) |>
+  head(10) |>
   select(date, day_of_week, call_count, z_score)
 
 # Display these days
-top_outliers %>% kable(digits = 2)
+top_outliers |> kable(digits = 2)
 ```
 
-## Journalistic Insights
+## Task 10: Journalistic Insights (6 points)
 
-Based on our z-score analysis, here are some potential angles for reporting:
+Based on our z-score analysis, what are some potential angles for reporting? What would your next steps be and what would you tell an editor about your findings?
 
 ANSWER HERE
 
