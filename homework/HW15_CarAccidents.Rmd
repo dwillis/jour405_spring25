@@ -1,0 +1,376 @@
+---
+title: "Finding Stories in Prince George's County Accident Data"
+author: "YOUR NAME"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Analyzing Accident Data with Z-Scores
+
+## Introduction
+
+In this analysis, we'll examine monthly accident data from Prince George's County to identify statistically unusual patterns that might lead to newsworthy stories. Z-scores provide a powerful statistical method to determine which months experienced an abnormal number of accidents compared to typical patterns.
+
+A z-score tells us how many standard deviations a data point is from the mean. Generally:
+- Z-scores between -2 and 2 represent typical values (about 95% of the data)
+- Z-scores beyond ±2 indicate unusual values that might warrant investigation
+- Z-scores beyond ±3 are very unusual (only about 0.3% of normally distributed data)
+
+## Setup
+
+Let's start by loading the necessary packages:
+
+```{r load-packages}
+library(tidyverse)  # For data manipulation and visualization
+library(knitr)      # For nice tables
+library(lubridate)  # For working with dates
+```
+
+## Loading the Data
+
+We'll load the accident data from our CSV file:
+
+```{r load-data}
+# Load accident data
+accidents <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/monthly_accidents.csv")
+
+# Display the first few rows
+head(accidents)
+```
+
+## Data Exploration
+
+Let's first understand our dataset structure:
+
+```{r data-exploration}
+# Get a summary of the data
+summary(accidents)
+```
+
+Now let's create a time series visualization of accidents:
+
+```{r time-series-plot}
+# Plot time series
+ggplot(accidents, aes(x = month, y = total)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Monthly Accidents in Prince George's County",
+       x = "Month",
+       y = "Number of Accidents",
+       caption = "Source: Prince George's County Accident Data")
+```
+
+## Calculating Z-Scores
+
+Now, let's calculate z-scores for our accident totals:
+
+```{r calculate-z-scores}
+# Calculate z-scores for total accidents
+accidents <- accidents |>
+  mutate(
+    mean_accidents = mean(total),
+    sd_accidents = sd(total),
+    z_score = (total - mean_accidents) / sd_accidents
+  )
+
+# Display the data with z-scores
+accidents |>
+  select(month, total, z_score) |>
+  head(10) |>
+  kable(digits = 2)
+```
+
+## Identifying Unusual Months
+
+Let's identify months with unusually high or low accident numbers (|z-score| > 2):
+
+```{r unusual-months}
+# Find months with unusual accident numbers
+unusual_months <- accidents |>
+  filter(abs(z_score) > 2) |>
+  arrange(desc(abs(z_score)))
+
+# Display unusual months
+unusual_months |>
+  select(month, total, z_score) |>
+  kable(digits = 2)
+```
+
+Let's visualize these unusual months:
+
+```{r plot-unusual-months}
+# Highlight unusual months in the time series
+ggplot(accidents, aes(x = month, y = total, color = abs(z_score) > 2)) +
+  geom_line(color = "gray") +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("black", "red"), 
+                     name = "Unusual Value",
+                     labels = c("Normal", "Unusual")) +
+  theme_minimal() +
+  labs(title = "Monthly Accidents with Unusual Months Highlighted",
+       subtitle = "Unusual months have z-scores with absolute values > 2",
+       x = "Month",
+       y = "Number of Accidents",
+       caption = "Source: Prince George's County Accident Data")
+```
+
+## Seasonal Patterns
+
+Let's check if there are seasonal patterns in accident rates:
+
+```{r seasonal-analysis}
+# Extract month from date
+accidents <- accidents |>
+  mutate(month_of_year = month(month, label = TRUE))
+
+# Calculate average accidents by month
+monthly_pattern <- accidents |>
+  group_by(month_of_year) |>
+  summarize(
+    avg_accidents = mean(total),
+  )
+
+# Plot seasonal pattern
+ggplot(monthly_pattern, aes(x = month_of_year, y = avg_accidents, group = 1)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Average Accidents by Month",
+       x = "Month",
+       y = "Average Number of Accidents",
+       caption = "Source: Prince George's County Accident Data")
+```
+
+## Adjusting for Seasonality
+
+We can also calculate z-scores that account for seasonal patterns:
+
+```{r seasonal-z-scores}
+# Calculate seasonal z-scores
+accidents <- accidents |>
+  group_by(month_of_year) |>
+  mutate(
+    seasonal_mean = mean(total),
+    seasonal_sd = sd(total),
+    seasonal_z_score = (total - seasonal_mean) / seasonal_sd
+  ) |>
+  ungroup()
+
+# Find months with unusual seasonal z-scores
+unusual_seasonal <- accidents |>
+  filter(abs(seasonal_z_score) > 2) |>
+  arrange(desc(abs(seasonal_z_score)))
+
+# Display months that are unusual for their season
+unusual_seasonal |>
+  select(month, month_of_year, total, seasonal_mean, seasonal_z_score) |>
+  kable(digits = 2)
+```
+
+## Year-Over-Year Analysis
+
+Let's compare accident rates year-over-year to identify any trends:
+
+```{r year-analysis}
+# Extract year from date
+accidents <- accidents |>
+  mutate(year = year(month))
+
+# Calculate yearly averages
+yearly_averages <- accidents |>
+  group_by(year) |>
+  summarize(
+    avg_monthly_accidents = mean(total),
+    total_yearly_accidents = sum(total)
+  )
+
+# Display yearly averages
+yearly_averages |>
+  kable(digits = 1)
+
+# Plot yearly trends
+ggplot(yearly_averages, aes(x = year, y = avg_monthly_accidents)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Average Monthly Accidents by Year",
+       x = "Year",
+       y = "Average Monthly Accidents",
+       caption = "Source: Prince George's County Accident Data")
+```
+
+## Looking for Trends
+
+Let's check for any long-term trends in accident rates:
+
+```{r trend-analysis}
+# Add a 6-month moving average to identify trends
+accidents <- accidents |>
+  arrange(month) |>
+  mutate(
+    moving_avg_6month = zoo::rollmean(total, k = 6, fill = NA, align = "right")
+  )
+
+# Plot with moving average
+ggplot(accidents, aes(x = month)) +
+  geom_line(aes(y = total), color = "gray60") +
+  geom_point(aes(y = total, color = abs(z_score) > 2), size = 2) +
+  geom_line(aes(y = moving_avg_6month), color = "blue", size = 1) +
+  scale_color_manual(values = c("black", "red"), 
+                     name = "Unusual Value",
+                     labels = c("Normal", "Unusual")) +
+  theme_minimal() +
+  labs(title = "Monthly Accidents with 6-Month Moving Average",
+       x = "Month",
+       y = "Number of Accidents",
+       caption = "Source: Prince George's County Accident Data")
+```
+
+## Identifying Extreme Outliers
+
+Let's look specifically at months with extremely unusual accident counts (z-scores beyond ±3):
+
+```{r extreme-outliers}
+# Find extreme outliers
+extreme_outliers <- accidents |>
+  filter(abs(z_score) > 3) |>
+  arrange(desc(abs(z_score)))
+
+# Display extreme outliers
+if(nrow(extreme_outliers) > 0) {
+  extreme_outliers |>
+    select(month, total, z_score) |>
+    kable(digits = 2)
+} else {
+  cat("No months with z-scores beyond ±3 were found in the dataset.")
+}
+```
+
+## Finding Potential Story Ideas
+
+Based on our z-score analysis, here are some potential journalistic angles:
+
+### 1. Investigating Extreme Outliers
+
+```{r story-idea-1}
+# Display the most unusual months (highest absolute z-scores)
+top_outliers <- accidents |>
+  arrange(desc(abs(z_score))) |>
+  head(5) |>
+  select(month, total, z_score)
+
+top_outliers |> kable(digits = 2)
+```
+
+**Story Angle**: What happened during [specific month with highest z-score]? This month saw [X]% more/fewer accidents than typical. Potential factors could include:
+- Unusual weather events
+- Major construction or road closures
+- Changes in traffic enforcement
+- Holiday travel patterns
+
+### 2. Seasonal Anomalies
+
+```{r story-idea-2}
+# Display months that were unusual for their season
+unusual_seasonal |>
+  select(month, month_of_year, total, seasonal_mean, seasonal_z_score) |>
+  head(5) |>
+  kable(digits = 2)
+```
+
+**Story Angle**: Why did [specific month/year] break from typical seasonal patterns? This [month] saw [X]% more/fewer accidents than is typical for that time of year.
+
+### 3. Trend Analysis
+
+```{r story-idea-3}
+# Calculate year-over-year percent changes
+yearly_changes <- yearly_averages |>
+  arrange(year) |>
+  mutate(
+    pct_change = (total_yearly_accidents - lag(total_yearly_accidents)) / lag(total_yearly_accidents) * 100
+  )
+
+yearly_changes |>
+  select(year, total_yearly_accidents, pct_change) |>
+  kable(digits = 1)
+```
+
+**Story Angle**: Accident rates in Prince George's County have [increased/decreased] by [X]% over the past [Y] years. What factors are driving this change?
+
+### 4. Consecutive Unusual Months
+
+```{r story-idea-4}
+# Look for runs of consecutive unusual months
+accidents <- accidents |>
+  arrange(month) |>
+  mutate(unusual = abs(z_score) > 2) |>
+  mutate(run_id = cumsum(unusual != lag(unusual, default = FALSE)))
+
+unusual_runs <- accidents |>
+  filter(unusual) |>
+  group_by(run_id) |>
+  summarize(
+    start_date = min(month),
+    end_date = max(month),
+    months = n(),
+    avg_z_score = mean(abs(z_score))
+  ) |>
+  filter(months > 1) # Runs of 2 or more consecutive unusual months
+
+if(nrow(unusual_runs) > 0) {
+  unusual_runs |> kable(digits = 2)
+} else {
+  cat("No runs of consecutive unusual months were found in the dataset.")
+}
+```
+
+**Story Angle**: Between [start date] and [end date], Prince George's County experienced [X] consecutive months of unusually [high/low] accident rates. What sustained factors might explain this pattern?
+
+### 5. Comparing with External Factors
+
+**Story Angle**: How do accident patterns correlate with:
+- Changes in county population
+- Traffic enforcement policy changes
+- Implementation of new traffic safety measures
+- Economic factors (gas prices, unemployment)
+- Pandemic-related changes in commuting patterns
+
+## Journalistic Questions to Pursue
+
+Based on our analysis, here are key questions a journalist should follow up on:
+
+1. For the months with the highest z-scores:
+   - Were there specific major accidents that significantly increased the total?
+   - Were there unusual weather conditions (snow, ice, flooding) that contributed?
+   - Were there changes in how accidents were reported or recorded?
+
+2. For months that broke seasonal patterns:
+   - Did any policy changes take effect around that time?
+   - Were there unusual events in the county during those periods?
+   - How did the county respond to the unusual accident rates?
+
+3. For long-term trends:
+   - Has the county implemented any traffic safety initiatives that might explain trends?
+   - How do population and traffic volume changes compare to accident rate changes?
+   - What do traffic safety officials say about the patterns identified?
+
+4. For comparison purposes:
+   - How do these patterns compare with neighboring counties?
+   - Are national accident trends similar or different?
+   - Have similar jurisdictions experienced comparable patterns?
+
+## Conclusion
+
+Z-scores provide a powerful statistical tool for identifying unusual patterns in accident data. By calculating these standardized measures, we can quickly pinpoint months that deviate significantly from typical patterns, which can lead to important journalistic insights about traffic safety in Prince George's County.
+
+When reporting on these findings, remember to:
+
+1. **Provide Context**: Explain what a z-score means in terms readers can understand
+2. **Investigate Causes**: Follow up on unusual values to understand the underlying reasons
+3. **Consider Multiple Metrics**: Look at both raw numbers and seasonal adjustments
+4. **Connect Data to People**: Identify who is affected by these patterns and include their perspectives
+
+By combining statistical analysis with traditional reporting techniques, journalists can uncover meaningful stories about public safety that might otherwise remain hidden in the data.

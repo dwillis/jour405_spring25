@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 ## Introduction
 
-In this walkthrough, we'll analyze monthly car theft data from 2017 to 2025 using z-scores. Z-scores help us identify statistically unusual values in our dataset, which can point to important patterns or outliers that deserve journalistic attention.
+In this notebook, you'll analyze monthly car theft data from 2017 to 2025 using z-scores. Z-scores help us identify statistically unusual values in our dataset, which can point to important patterns or outliers that deserve journalistic attention.
 
 A z-score tells us how many standard deviations a data point is from the mean. Generally:
 - Z-scores between -2 and 2 represent typical values (about 95% of the data)
