@@ -1,0 +1,273 @@
+---
+title: "Car Theft Z-Score Analysis"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Analyzing Car Theft Data with Z-Scores
+
+## Introduction
+
+In this walkthrough, we'll analyze monthly car theft data from 2017 to 2025 using z-scores. Z-scores help us identify statistically unusual values in our dataset, which can point to important patterns or outliers that deserve journalistic attention.
+
+A z-score tells us how many standard deviations a data point is from the mean. Generally:
+- Z-scores between -2 and 2 represent typical values (about 95% of the data)
+- Z-scores beyond ±2 indicate unusual values that might warrant investigation
+- Z-scores beyond ±3 are very unusual (only about 0.3% of normally distributed data)
+
+## Setup
+
+Let's start by loading the necessary packages:
+
+```{r load-packages}
+library(tidyverse)  # For data manipulation and visualization
+library(knitr)      # For nice tables
+library(lubridate)  # For working with dates
+```
+
+## Loading the Data
+
+We'll load the car theft data from our CSV file:
+
+```{r load-data}
+# Load car theft data
+car_thefts <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/car_thefts_month17_25.csv")
+
+# Display the first few rows
+head(car_thefts)
+```
+
+## Data Exploration
+
+Let's first understand our dataset structure:
+
+```{r data-exploration}
+# Get a summary of the data
+summary(car_thefts)
+
+# Check dimensions
+dim(car_thefts)
+
+# Check for missing values
+sum(is.na(car_thefts))
+```
+
+Now let's create a time series visualization of car thefts:
+
+```{r time-series-plot}
+# Convert month to proper date format (assuming format like "Jan 2017")
+car_thefts <- car_thefts %>%
+  mutate(date = parse_date_time(month, "my"))
+
+# Plot time series
+ggplot(car_thefts, aes(x = month, y = total)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Monthly Car Thefts (2017-2025)",
+       x = "Month",
+       y = "Number of Car Thefts",
+       caption = "Source: Car Theft Dataset")
+```
+
+## Calculating Z-Scores
+
+Now, let's calculate z-scores for our car theft totals:
+
+```{r calculate-z-scores}
+# Calculate z-scores for total car thefts
+car_thefts <- car_thefts %>%
+  mutate(
+    mean_thefts = mean(total),
+    sd_thefts = sd(total),
+    z_score = (total - mean_thefts) / sd_thefts
+  )
+
+# Display the data with z-scores
+car_thefts %>%
+  select(month, total, z_score) %>%
+  head(10) %>%
+  kable(digits = 2)
+```
+
+## Identifying Unusual Months
+
+Let's identify months with unusually high or low car theft numbers (|z-score| > 2):
+
+```{r unusual-months}
+# Find months with unusual car theft numbers
+unusual_months <- car_thefts %>%
+  filter(abs(z_score) > 2) %>%
+  arrange(desc(abs(z_score)))
+
+# Display unusual months
+unusual_months %>%
+  select(month, total, z_score) %>%
+  kable(digits = 2)
+```
+
+Let's visualize these unusual months:
+
+```{r plot-unusual-months}
+# Highlight unusual months in the time series
+ggplot(car_thefts, aes(x = month, y = total, color = abs(z_score) > 2)) +
+  geom_line(color = "gray") +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("black", "red"), 
+                     name = "Unusual Value",
+                     labels = c("Normal", "Unusual")) +
+  theme_minimal() +
+  labs(title = "Monthly Car Thefts with Unusual Months Highlighted",
+       subtitle = "Unusual months have z-scores with absolute values > 2",
+       x = "Month",
+       y = "Number of Car Thefts",
+       caption = "Source: Car Theft Dataset")
+```
+
+## Adjusting for Population
+
+Raw numbers might be misleading if the population changes over time. Let's calculate car thefts per 100,000.
+
+```{r per-capita-rates}
+# Calculate thefts per 100,000 population
+car_thefts <- car_thefts %>%
+  mutate(
+    thefts_per_100k = (total / population) * 100000,
+    mean_per_100k = mean(thefts_per_100k),
+    sd_per_100k = sd(thefts_per_100k),
+    z_score_per_100k = (thefts_per_100k - mean_per_100k) / sd_per_100k
+  )
+
+# Display the first few rows with per capita rates
+car_thefts %>%
+  select(month, total, population, thefts_per_100k, z_score_per_100k) %>%
+  head(10) %>%
+  kable(digits = 2)
+```
+
+Let's find months with unusual per capita theft rates:
+
+```{r unusual-per-capita}
+# Find months with unusual per capita theft rates
+unusual_per_capita <- car_thefts %>%
+  filter(abs(z_score_per_100k) > 2) %>%
+  arrange(desc(abs(z_score_per_100k)))
+
+# Display unusual per capita months
+unusual_per_capita %>%
+  select(month, thefts_per_100k, z_score_per_100k) %>%
+  kable(digits = 2)
+```
+
+Visualize the per capita rates:
+
+```{r plot-per-capita}
+# Plot per capita theft rates
+ggplot(car_thefts, aes(x = month, y = thefts_per_100k, color = abs(z_score_per_100k) > 2)) +
+  geom_line(color = "gray") +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("black", "red"), 
+                     name = "Unusual Value",
+                     labels = c("Normal", "Unusual")) +
+  theme_minimal() +
+  labs(title = "Car Thefts per 100,000 Population",
+       subtitle = "Unusual months have z-scores with absolute values > 2",
+       x = "Month",
+       y = "Thefts per 100,000 Population",
+       caption = "Source: Car Theft Dataset")
+```
+
+## Comparing Raw Numbers vs. Per Capita Rates
+
+It's interesting to compare which months stand out as unusual based on raw numbers versus per capita rates:
+
+```{r compare-unusual}
+# Combine unusual months from both metrics
+unusual_combined <- car_thefts %>%
+  filter(abs(z_score) > 2 | abs(z_score_per_100k) > 2) %>%
+  select(month, total, z_score, thefts_per_100k, z_score_per_100k) %>%
+  arrange(month)
+
+# Display combined unusual months
+unusual_combined %>%
+  kable(digits = 2)
+```
+
+## Seasonal Patterns
+
+Let's also check if there are seasonal patterns in car thefts:
+
+```{r seasonal-analysis}
+# Extract month from date
+car_thefts <- car_thefts %>%
+  mutate(month_of_year = month(month, label = TRUE))
+
+# Calculate average thefts by month
+monthly_pattern <- car_thefts %>%
+  group_by(month_of_year) %>%
+  summarize(
+    avg_thefts = mean(total),
+    avg_per_100k = mean(thefts_per_100k)
+  )
+
+# Plot seasonal pattern
+ggplot(monthly_pattern, aes(x = month_of_year, y = avg_thefts, group = 1)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Average Car Thefts by Month",
+       x = "Month",
+       y = "Average Number of Thefts",
+       caption = "Source: Car Theft Dataset")
+```
+
+## Adjusting for Seasonality
+
+We can also calculate z-scores that account for seasonal patterns:
+
+```{r seasonal-z-scores}
+# Calculate seasonal z-scores
+car_thefts <- car_thefts %>%
+  group_by(month_of_year) %>%
+  mutate(
+    seasonal_mean = mean(total),
+    seasonal_sd = sd(total),
+    seasonal_z_score = (total - seasonal_mean) / seasonal_sd
+  ) %>%
+  ungroup()
+
+# Find months with unusual seasonal z-scores
+unusual_seasonal <- car_thefts %>%
+  filter(abs(seasonal_z_score) > 2) %>%
+  arrange(desc(abs(seasonal_z_score)))
+
+# Display months that are unusual for their season
+unusual_seasonal %>%
+  select(month, total, seasonal_mean, seasonal_z_score) %>%
+  kable(digits = 2)
+```
+
+## Journalistic Insights
+
+Based on our z-score analysis, here are some potential journalistic angles:
+
+1. **Extreme Outliers**: Months with z-scores beyond ±3 represent extremely unusual car theft activity. We could investigate what specific events or factors contributed to these extreme values.
+
+2. **Seasonal Anomalies**: Months that are statistically unusual for their season might indicate changes in theft patterns that break from traditional seasonal trends.
+
+3. **Trend Changes**: Clusters of months with high z-scores might indicate shifts in car theft trends that could be linked to economic conditions, law enforcement policies, or other social factors.
+
+4. **Population Impact**: Differences between raw number z-scores and per capita z-scores might reveal how population changes affect crime statistics reporting.
+
+## Conclusion
+
+Z-scores provide a powerful statistical tool for identifying unusual patterns in time series data like monthly car thefts. By calculating these scores, we can quickly identify months that deviate significantly from the norm, which can lead to journalistic insights and story ideas.
+
+When reporting on these findings, remember to:
+
+1. **Provide Context**: Explain what a z-score means in terms readers can understand
+2. **Investigate Causes**: Follow up on unusual values to understand the underlying reasons
+3. **Consider Multiple Metrics**: Look at both raw numbers and population-adjusted figures
+4. **Account for Seasonality**: Consider whether values are unusual compared to the same time of year

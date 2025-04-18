@@ -6,14 +6,51 @@ Remember how we talked about people killing each other more when it's hot outsid
 
 ### Task 1: Load the tidyverse
 
-### Task 2: Load the dataset from <https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv>
+```{r}
+library(tidyverse)
+```
+
+
+### Task 2: Load the dataset from [https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv](https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv)
+
+```{r}
+pg_murders_heat <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_murder_temps.csv")
+```
+
 
 ### Task 3: Use `summarize()` and the `cor()` function to calculate the correlation between murders and temperature, using the pearson method.
 
+```{r}
+pg_murders_heat |> summarize(correlation = cor(murders, temperature, method="pearson"))
+```
+
+
 ### Task 4: Create a scatterplot of murders and temperature, using `geom_point()`. Your aes() will have temperatures on the x axis, murders on the y axis and add a label for the month (so label=month inside the aes()).
+
+```{r}
+
+pg_murders_heat |> 
+  ggplot() +
+  geom_point(aes(x=temperature, y=murders, label=month)) +
+  geom_smooth(aes(x=temperature, y=murders, method="lm"))
+
+```
+
 
 ### Task 5: Add labels to the scatterplot using geom_text(). Inside geom_text() put the same aes() as geom_point in Task 4, then after the aes() add size = 5.
 
+```{r}
+
+pg_murders_heat |> 
+  ggplot() +
+  geom_text(aes(x=temperature, y=murders, label=month), size = 5) +
+  geom_smooth(aes(x=temperature, y=murders, method="lm"))
+
+```
+
+
 ### Task 6: Describe the results of both the correlation calculation and the scatterplot.
+
+The results of both the correlation calculation and the scatterplot show both increased temperatures and overall numbers of murders during May, June, July, August and September (with upper bounds of about 80 degrees and 45 murders) — and decreased temperatures and murders in November, Februrary, January and December (with lower bounds of around 35 degrees and 20 murders). The scatterplot illustrates somewhat of a steep dropoff between these two categories of months, relating to the conclusion that more murders occur during the summer months (when temperatures are high and it's more appealing for indivudals to be outside), while a decreased number of murders occur in relation to colder temperature-months (specifically in the winter season, when it's less appealing for individuals to go outside and less accessible for murders to take place). In short, there's definitely a moderate to strong correlation between overall temperatures and number of murders.
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.

@@ -1,0 +1,190 @@
+---
+title: "Hypothesis Testing: Do Goggles Help Jeffrey Swim Faster?"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Introduction
+
+In this analysis, we'll investigate whether wearing goggles helps Jeffrey swim faster. We'll compare his swim times with goggles to his baseline performance without goggles using a one-sample t-test.
+
+## Step 1: Load Required Libraries
+
+First, we need to load the tidyverse package, which includes ggplot2 for visualization and dplyr for data manipulation.
+
+```{r}
+# Load required libraries
+library(tidyverse)
+```
+
+## Step 2: Create the Dataset
+
+We'll create a dataset with Jeffrey's 15 swim times when wearing goggles.
+
+```{r}
+# Create the dataset with Jeffrey's 15 swim times with goggles
+jeffrey_times <- c(
+  16.2, 15.8, 16.1, 15.7, 16.3, 
+  15.9, 16.0, 15.6, 16.4, 15.8, 
+  16.1, 15.7, 15.9, 16.2, 16.0
+)
+```
+
+## Step 3: Set Up Hypothesis Test Parameters
+
+We'll define our baseline statistics (Jeffrey's performance without goggles) and significance level.
+
+```{r}
+# Set up our hypothesis test parameters
+baseline_mean <- 16.43  # Jeffrey's mean time without goggles
+baseline_sd <- 0.8      # Standard deviation without goggles
+alpha <- 0.05           # Significance level
+```
+
+## Step 4: Organize Data into a Tibble
+
+We'll create a structured tibble for easier analysis.
+
+```{r}
+# Create a tibble with the swim data
+swim_data <- tibble(
+  trial = 1:15,
+  time_with_goggles = jeffrey_times
+)
+
+# Display the first few rows
+head(swim_data)
+```
+
+## Step 5: Calculate Summary Statistics
+
+Now we'll compute the key statistics needed for our hypothesis test.
+
+```{r}
+# Calculate summary statistics
+swim_summary <- swim_data %>%
+  summarize(
+    sample_size = n(),
+    sample_mean = mean(time_with_goggles),
+    sample_sd = sd(time_with_goggles),
+    se = sample_sd / sqrt(sample_size),
+    t_stat = (sample_mean - baseline_mean) / se,
+    degrees_freedom = sample_size - 1,
+    p_value = pt(t_stat, degrees_freedom) # one-tailed test since we're testing if time is faster (lower)
+  )
+
+# Display the summary statistics
+swim_summary
+```
+
+## Step 6: Visualize the Hypothesis Test
+
+This visualization shows the null hypothesis distribution (blue curve) and where our sample mean falls (red dashed line).
+
+```{r}
+# Create a visualization of the hypothesis test
+ggplot() +
+  # Draw the null hypothesis distribution
+  stat_function(
+    fun = function(x) dnorm(x, mean = baseline_mean, sd = baseline_sd / sqrt(15)),
+    geom = "line",
+    color = "blue",
+    size = 1
+  ) +
+  # Add a vertical line for the sample mean
+  geom_vline(
+    xintercept = swim_summary$sample_mean,
+    color = "red",
+    linetype = "dashed",
+    size = 1
+  ) +
+  # Add annotation for p-value
+  annotate(
+    "text",
+    x = swim_summary$sample_mean - 0.2,
+    y = 0.4,
+    label = paste("p-value =", round(swim_summary$p_value, 4)),
+    color = "black"
+  ) +
+  # Add labels and title
+  labs(
+    title = "Hypothesis Test: Do Goggles Help Jeffrey Swim Faster?",
+    subtitle = paste0("H₀: μ = ", baseline_mean, " seconds vs. H₁: μ < ", baseline_mean, " seconds"),
+    x = "Swim Time (seconds)",
+    y = "Probability Density"
+  ) +
+  # Set x-axis limits for better visualization
+  xlim(15, 17.5) +
+  theme_minimal()
+```
+
+## Step 7: Verify with R's Built-in t-test Function
+
+We'll double-check our observations using R's built-in t.test function.
+
+```{r}
+# Perform the t-test using R's built-in function (for verification)
+t_test_result <- t.test(
+  swim_data$time_with_goggles,
+  mu = baseline_mean,
+  alternative = "less"  # one-sided test (faster means less time)
+)
+
+# Display the t-test results
+t_test_result
+```
+
+## Step 8: Summarize Results in a Table
+
+Finally, we'll create a comprehensive table summarizing all our findings.
+
+```{r}
+# Create a results table
+results_table <- tibble(
+  Metric = c(
+    "Baseline Mean (without goggles)",
+    "Baseline Standard Deviation",
+    "Sample Mean (with goggles)",
+    "Sample Standard Deviation",
+    "Sample Size",
+    "Standard Error",
+    "t-statistic",
+    "Degrees of Freedom",
+    "p-value",
+    "Significant at α = 0.05?",
+    "Conclusion"
+  ),
+  Value = c(
+    baseline_mean,
+    baseline_sd,
+    round(swim_summary$sample_mean, 2),
+    round(swim_summary$sample_sd, 2),
+    swim_summary$sample_size,
+    round(swim_summary$se, 3),
+    round(swim_summary$t_stat, 3),
+    swim_summary$degrees_freedom,
+    round(swim_summary$p_value, 4),
+    ifelse(swim_summary$p_value < alpha, "Yes", "No"),
+    ifelse(swim_summary$p_value < alpha, 
+           "Reject H₀: Goggles helped Jeffrey swim faster", 
+           "Fail to reject H₀: No evidence goggles helped")
+  )
+)
+
+# Display the results table in a formatted way
+knitr::kable(results_table, caption = "Summary of Hypothesis Test Results")
+```
+
+## Conclusion
+
+Our analysis shows that Jeffrey's mean swim time with goggles (approximately `r round(swim_summary$sample_mean, 2)` seconds) is lower than his baseline mean without goggles (`r baseline_mean` seconds). 
+
+The p-value of `r round(swim_summary$p_value, 4)` is less than our significance level of 0.05, suggesting that this improvement is statistically significant. Therefore, we reject the null hypothesis and conclude that wearing goggles does appear to help Jeffrey swim faster.

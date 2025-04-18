@@ -1,0 +1,108 @@
+```{r}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+```
+
+## Testing Statistical Significance with P-values
+
+### Are Maryland's WBB players shorter than other D-I teams' players?
+
+```{r}
+# Load the data
+
+wbb_rosters <- read_csv("https://raw.githubusercontent.com/Sports-Roster-Data/womens-college-basketball/main/wbb_rosters_2024_25.csv") |> filter(!is.na(total_inches)) |> filter(division == 'I')
+
+population_data <- wbb_rosters[sample(nrow(wbb_rosters), 100), ]
+
+maryland <- wbb_rosters |> filter(ncaa_id == 392)
+```
+
+#### Define hypotheses
+
+Null Hypothesis (H0): There is no significant difference in the average height of players on Maryland compared to the average height of a sample of players from the NCAA's Division I.
+
+Alternative Hypothesis (H1): There is a significant difference in the average height of players on Maryland compared to the average height of a sample of players from the NCAA's Division I.
+
+
+### The Formula
+
+To calculate a t-test for significance, we need to use averages of the height of both the sample data (maryland) and the population (population_data), the standard deviation among our sample and the significance level or alpha, which is at the 95% confidence interval.
+
+```{r}
+
+# average Maryland height
+mean(maryland$total_inches)
+
+# average sample height
+mean(population_data$total_inches)
+
+# standard deviation among Maryland players
+standard_deviation <- sd(maryland$total_inches)
+
+# Set significance level
+alpha <- 0.05
+
+# Perform the hypothesis test
+result <- t.test(x = maryland$total_inches, mu = mean(population_data$total_inches), sd = standard_deviation / sqrt(nrow(population_data)), alternative = "two.sided")
+
+# Calculate p-value
+p_value <- result$p.value
+
+# Make a decision
+if (p_value < alpha) {
+  decision <- "reject the null hypothesis, so there is a"
+} else {
+  decision <- "fail to reject the null hypothesis, so there is no"
+}
+
+# Interpretation
+interpretation <- paste("Based on the p-value of", round(p_value, 4),
+                        ", at a significance level of", alpha,
+                        ", we", decision, "statistically significant difference in the average height of Maryland players compared to a sample of all Division I players.")
+
+interpretation
+
+```
+
+The key findings are:
+
+
+
+
+### When we have a mean but not the actual times.
+
+If we don't have the individual figures for a set, just the mean, then we can calculate the t-statistic another way, using the function `pt`. Let's say that we have the following scenario:
+
+**Background**: Sarah, an amateur runner, usually runs a 5k (3.1 miles) race with an average time of 25.5 minutes. She has a standard deviation of 1.2 minutes in her past race timings.
+
+**Intervention**: Her coach suggested that a new energy drink could help her run faster. Sarah decided to try the energy drink and recorded her race times for 15 subsequent 5k races.
+
+**Data**: After using the new energy drink, Sarah’s mean time for these 15 races was 24.8 minutes.
+
+**Objective**: Sarah’s coach thinks that the energy drink has significantly improved her running times. Perform a hypothesis test with a preset alpha of 0.05 to evaluate this claim, assuming the running times are normally distributed.
+
+```{r}
+# Define the sample data
+sample_mean <- 24.8
+hypothesized_mean <- 25.5
+sample_std_dev <- 1.2
+sample_size <- 15
+
+# Calculate the t-statistic
+t_statistic <- (sample_mean - hypothesized_mean) / (sample_std_dev / sqrt(sample_size))
+
+# Calculate the degrees of freedom
+degrees_of_freedom <- sample_size - 1
+
+# Calculate the p-value for a one-tailed test
+p_value <- pt(t_statistic, df = degrees_of_freedom)
+
+# Display the results: t-statistic and p-value
+t_statistic
+p_value
+
+
+```
+
+If the p-value is less than 0.05, it indicates that there is statistically significant evidence to reject the null hypothesis, suggesting that the energy drink helps Sarah run faster. In this case, there is.
