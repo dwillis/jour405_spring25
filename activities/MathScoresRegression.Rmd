@@ -8,9 +8,9 @@ options(scipen = 999)
 
 ### Introduction
 
-In this analysis, we will use linear regression to identify the schools that show the biggest differences between their actual and expected math test scores. We'll then create a scatterplot to visualize the relationship between the FARMS (Free and Reduced-price Meal System) percentage and the percentage of students who met or exceeded math expectations.
+In this analysis, we will create a scatterplot to visualize the relationship between the FARMS (Free and Reduced-price Meal System) percentage and the percentage of students who met or exceeded math expectations. We'll then use linear regression to identify the schools that show the biggest differences between their actual and expected math test scores.
 
-This analysis can be useful for journalists and policymakers to understand which schools are performing better or worse than expected, based on the socioeconomic status of their student population. By identifying these schools, targeted interventions and support can be provided to help improve student outcomes.
+This analysis can be useful for journalists to understand which schools are performing better or worse than expected, based on the socioeconomic status of their student population. By identifying these schools, targeted interventions and support can be provided to help improve student outcomes - and to provide some context on comments by policymakers.
 
 ### Loading the Data
 
@@ -21,7 +21,7 @@ schools <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/ref
 ```
 ### Task: Create a Scatterplot and Describe the Results (2 points)
 
-First, let's create a scatterplot to visualize the relationship between the FARMS percentage and the percentage of students who met or exceeded math expectations. We'll use ggplot2 to create the plot and add a linear regression line.
+Next, let's create a scatterplot to visualize the relationship between the FARMS percentage and the percentage of students who met or exceeded math expectations. We'll use ggplot2 to create the plot and add a linear regression line.
 
 ```{r}
 schools |>
@@ -54,19 +54,20 @@ Based on what you've learned so far, is this model worth using? What does it tel
 
 ANSWER HERE
 
-### Task: Identifying Schools with Biggest Residuals (2 point)
+### Task: Identifying Schools with Biggest Residuals (2 points)
 
 To find the schools with the biggest differences between their actual and expected math test scores, we'll extract the residuals from the linear regression model. The residuals represent the difference between the actual and predicted values. Residuals can tell you several things, but most important is if a linear model the right model for your data. If the residuals appear to be random, then a linear model is appropriate. If they have a pattern, it means something else is going on in your data and a linear model isn’t appropriate.
 
 Residuals can also tell you who is under-performing and over-performing the model. And the more robust the model – the better your r-squared value is – the more meaningful that label of under or over-performing is. 
 
-We'll then use the arrange() function to sort the data frame by the residuals, both in descending and ascending order, and take the top 5 schools in each direction.
+We'll then use the arrange() function to sort the data frame by the absolute value of the residuals.
 
 ```{r}
 schools$predicted <- predict(model)
 
 # Calculate the residuals
-schools$residual <- schools$`% Met or Exceeded Math Expectations` - schools$predicted
+schools <- schools |> 
+  mutate(residual = `% Met or Exceeded Math Expectations` - predicted)
 
 # Sort the data frame by the absolute value of the residuals in descending order
 schools <- schools |>
@@ -78,11 +79,8 @@ The schools with the biggest positive residuals are performing better than expec
 
 ANSWER HERE
 
-
 ## Task: Evaluate the model (3 points)
 
-A school board member has said at a meeting that elementary schools with fewer students on free and reduced price meals do better on standardized math tests. Describe what conclusion you'd draw from this model's results and how it would influence a story pitch about the school board member and math scores.
-
-ANSWER HERE
+A school board member has said at a meeting that elementary schools with fewer students on free and reduced price meals do better on standardized math tests. Describe what conclusions you'd draw from this model's results and how it would influence a story pitch about the school board member and math scores.
 
 ANSWER HERE
