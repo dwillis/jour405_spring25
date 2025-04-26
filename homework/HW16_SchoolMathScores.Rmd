@@ -74,7 +74,7 @@ schools <- schools |>
 
 ```
 
-Look at the absolute values of the residuals; what are the largest differences between the predicted result and the actual math scores? How would you describe the schools with the largest residuals?
+Look at the absolute values of the residuals; what are the largest differences between the predicted result and the actual math scores? Pick two schools with the largest residuals. Find the zip codes where they are located and using the CensusReporter.org website, describe the most interesting demographic data from each zip code.
 
 ANSWER HERE
 
