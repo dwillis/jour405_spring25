@@ -13,18 +13,21 @@ library(tidyverse)
 library(corrplot)
 ```
 
-## Data Import
+## Load the Data
 
-The first step in our analysis is to load the data. Here we read the data from a CSV file, which contains information about voter turnout and various demographic factors across Maryland counties. This dataset will be used to build our model.
+The first step in our analysis is to load the data. Here we read the data from a CSV file, which contains information about voter turnout and various demographic factors across Maryland counties. This dataset will be used to build our model that will try to see which factors are most important in predicting voter turnout. The turnout percentage is from the 2024 general election.
 
 ```{r}
 md_turnout <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_turnout.csv")
 head(md_turnout)
 ```
 
-## Exploratory Data Analysis
+## Task 1: Exploratory Data Analysis (4 points)
 
-Before building our model, let's explore the data to understand the variables and their relationships.
+Before building our model, let's explore the data to understand the variables and their relationships. Examine the correlation matrix to see how the independent variables relate to each other and to the dependent variable (voter turnout). Which variables seem to be correlated? Are there any that are not correlated at all? Also look at the multiple scatterplots. Which variables seem to have a linear relationship with the dependent variable? Which do not?
+
+ANSWER HERE
+
 
 ```{r}
 # Summary statistics
@@ -54,21 +57,13 @@ md_turnout |>
        y = "Voter turnout (%)")
 ```
 
-## Model Building
+## Task 2: Initial Model Evaluation (5 points)
 
-Next, we construct an initial linear model to analyze how different factors influence voter turnout across Maryland counties. This model helps us quantify the relationships and assess which factors are significant predictors of turnout.
-
-```{r}
-# Build initial model with all predictors
-initial_model <- lm(turnout ~ population + income + pct_bachelors_higher + 
-                   pct_unemployed + median_age + pct_white, data = md_turnout)
-summary(initial_model)
-
-```
+Next, we construct an initial linear model to analyze how different factors influence voter turnout across Maryland counties. This model helps us quantify the relationships and assess which factors are significant predictors of turnout. 
 
 ### Residuals
 
-The residuals of a model are the differences between observed values and the values predicted by the model. For your model:
+The residuals of a model are the differences between observed values and the values predicted by the model. For this model:
 
 * **Min and Max** values indicate the range of residuals. 
 * **Median** value tells us if the model is generally centered around the actual data points.
@@ -84,32 +79,43 @@ The coefficients tell us the estimated effect of each independent variable on th
 * **Median Age**: Do counties with older populations have different turnout rates?
 * **Race (pct_white)**: Is there a relationship between racial composition and turnout?
 
-### Model Fit (3 points)
+### Model Fit
 
 * **Residual Standard Error**: How much does the model typically deviate from actual turnout?
 * **Multiple R-squared**: What percentage of the variability in turnout is explained by the model?
 * **Adjusted R-squared**: How well does the model fit after accounting for the number of variables?
 * **F-statistic**: Is the model as a whole statistically significant?
 
-Is this a useful model, based on what you've seen? Why?
+
+Examine the output of the model, checking the coefficients, residuals, and overall model fit. How well does this multiple variable model predict turnout? Do any of the variables seem to be insignificant? Is this a useful model, based on what you've seen? Why?
 
 ANSWER HERE
 
-## Model Refinement
+```{r}
+# Build initial model with all predictors
+initial_model <- lm(turnout ~ population + income + pct_bachelors_higher + 
+                   pct_unemployed + median_age + pct_white, data = md_turnout)
+summary(initial_model)
 
-Let's create alternative models by adding or removing variables to see if we can improve the model's performance.
+```
+
+## Task 3: Model Refinement (3 points)
+
+Create three alternative models by adding or removing variables to see if we can improve the model's performance. Turnout will always be the dependent variable, but you should alter the independent variables by removing or adding some. Then compare the models using adjusted R-squared values. Are any of the models significantly better than the others?
+
+ANSWER HERE
 
 ```{r}
-# Model 2: Selected demographic factors
-model2 <- lm(turnout ~ income + pct_bachelors_higher + median_age, data = md_turnout)
+# Model 2
+model2 <- lm(turnout ~ REPLACE ME, data = md_turnout)
 summary(model2)
 
-# Model 3: Education, unemployment and race
-model3 <- lm(turnout ~ pct_bachelors_higher + pct_unemployed + pct_white, data = md_turnout)
+# Model 3
+model3 <- lm(turnout ~ REPLACE ME, data = md_turnout)
 summary(model3)
 
-# Model 4: Population, education and income
-model4 <- lm(turnout ~ population + pct_bachelors_higher + income, data = md_turnout)
+# Model 4
+model4 <- lm(turnout ~ REPLACE ME, data = md_turnout)
 summary(model4)
 
 # Compare models
@@ -133,15 +139,8 @@ ggplot(model_comparison, aes(x = reorder(Model, Adjusted_R_squared), y = Adjuste
        x = "Model")
 ```
 
-## Results Interpretation (4 points)
 
-The results from our modeling and correlation analysis show the strength of the relationships between voter turnout and various demographic and socioeconomic factors. By understanding these dynamics, journalists can better explain the factors that contribute to civic participation across different communities.
-
-Which of these factors have the most impact on voter turnout in Maryland counties? Are there any that do not seem impactful at all?
-
-ANSWER HERE
-
-## Using the Model (3 points)
+## Task 4: Using the Model (3 points)
 
 Without using the words "multiple regression model", describe how you could use this analysis to cover an election or voter participation story.
 
