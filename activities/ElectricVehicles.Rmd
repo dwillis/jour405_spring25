@@ -1,0 +1,169 @@
+---
+title: "Analysis of Electric and Hybrid Vehicle Registrations"
+---
+
+### Load the tidyverse
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+### Load the dataset
+
+```{r}
+vehicle_data <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/main/electric_hybrid_0424.csv")
+
+```
+### Descriptive Statistics (2 points)
+
+Question: which county has the highest per-capita rate of registrations? Run the block below and then provide the answer. Does the answer make sense to you?
+
+ANSWER HERE
+
+```{r}
+# Calculate total registrations and registrations per capita
+vehicle_data <- vehicle_data |>
+  mutate(
+    Total_Registrations = Electric + Hybrid,
+    Electric_per_1000 = (Electric / Population) * 1000,
+    Hybrid_per_1000 = (Hybrid / Population) * 1000
+  )
+
+# Display summary by county
+vehicle_data |>
+  arrange(desc(Electric_per_1000))
+
+```
+
+### Correlation
+
+```{r}
+# Correlation between electric and hybrid vehicles
+cor_test <- cor.test(vehicle_data$Electric, vehicle_data$Hybrid)
+cor_test
+
+# Comparing electric and hybrid vehicle registrations using paired t-test
+t_test <- t.test(vehicle_data$Electric, vehicle_data$Hybrid, paired = TRUE)
+t_test
+
+```
+
+Electric and hybrid car figures are very, very correlated - about 98%.
+
+There is a statistically significant difference between electric and hybrid vehicle counts, with electric vehicles being more numerous on average.
+
+### Linear Regression (3 points)
+
+Let's make a regression model testing whether we can predict the number of hybrid vehicles if we know the number of electric vehicles. Run the code below and summarize the results.
+
+ANSWER HERE
+
+```{r}
+# Fit the linear regression model
+model <- lm(Hybrid ~ Electric, data = vehicle_data)
+
+# Summarize the model to view coefficients and statistics
+summary(model)
+
+```
+
+### Calculate residuals (3 points)
+
+Run the code below and summarize the output. What do the residuals say about this model?
+
+ANSWER HERE
+
+```{r}
+residuals <- residuals(model)
+
+# Basic summary of residuals
+summary(residuals)
+
+```
+
+### Add a Predicted Value
+
+```{r}
+# Make predictions
+predictions <- predict(model, newdata = vehicle_data)
+
+# Add predictions and residuals to the original data
+vehicle_data$Predicted_Hybrid <- predictions
+vehicle_data$Residuals <- residuals
+
+# View the updated data frame
+vehicle_data |> arrange(desc(Residuals))
+
+```
+
+## Pick a County (5 points)
+
+Replace {county} in the URL with a county name- it will be lowercase, with _ separating any words, so "prince_georges" or "queen_annes" or "saint_marys"
+
+```{r}
+county_evs <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/main/evs/montgomery.csv")
+```
+
+### Let's make some regression models to see the trend over time
+
+```{r}
+county_evs <- county_evs |>
+  mutate(Year_Month = ym(Year_Month))
+
+
+model_electric <- lm(ELECTRIC ~ Year_Month, data = county_evs)
+model_plugin <- lm(`PLUG-IN HYBRID` ~ Year_Month, data = county_evs)
+
+summary(model_electric)
+summary(model_plugin)
+
+```
+
+### Let's make some plots
+
+
+```{r}
+# Electric Vehicles Plot
+ggplot(county_evs, aes(x = Year_Month, y = ELECTRIC)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue") +
+  labs(title = "Electric Vehicle Registrations Over Time",
+       x = "Year and Month", y = "Electric Vehicle Registrations")
+
+# Plug-In Hybrids Plot
+ggplot(county_evs, aes(x = Year_Month, y = `PLUG-IN HYBRID`)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "red") +
+  labs(title = "Plug-In Hybrid Vehicle Registrations Over Time",
+       x = "Year and Month", y = "Plug-In Hybrid Registrations")
+
+```
+
+### All Maryland Plot
+
+```{r}
+vehicle_data <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/main/evs/maryland.csv")
+
+vehicle_data <- vehicle_data |>
+  mutate(Year_Month = ym(Year_Month))
+
+
+ggplot(vehicle_data, aes(x = Year_Month)) +
+  geom_line(aes(y = ELECTRIC, colour = "Electric")) +
+  geom_line(aes(y = `PLUG-IN HYBRID`, colour = "Plug-In Hybrid")) +
+  facet_wrap(~County) +  # Creates a separate plot for each county
+  labs(
+    title = "Vehicle Registrations Over Time by County",
+    x = "Year and Month",
+    y = "Number of Registrations"
+  ) +
+  scale_color_manual(
+    name = "Type",
+    values = c("Electric" = "blue", "Plug-In Hybrid" = "red")
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+
+```
+
