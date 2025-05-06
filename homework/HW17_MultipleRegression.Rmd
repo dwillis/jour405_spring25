@@ -22,7 +22,7 @@ md_turnout <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/h
 head(md_turnout)
 ```
 
-## Task 1: Exploratory Data Analysis (4 points)
+## Task 1: Exploratory Data Analysis (5 points)
 
 Before building our model, let's explore the data to understand the variables and their relationships. Examine the correlation matrix to see how the independent variables relate to each other and to the dependent variable (voter turnout). Which variables seem to be correlated? Are there any that are not correlated at all? Also look at the multiple scatterplots. Which variables seem to have a linear relationship with the dependent variable? Which do not?
 
@@ -99,7 +99,7 @@ summary(initial_model)
 
 ```
 
-## Task 3: Model Refinement (3 points)
+## Task 3: Model Refinement (5 points)
 
 Create three alternative models by adding or removing variables to see if we can improve the model's performance. Turnout will always be the dependent variable, but you should alter the independent variables by removing or adding some. Then compare the models using adjusted R-squared values. Are any of the models significantly better than the others?
 
