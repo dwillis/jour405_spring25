@@ -1,0 +1,28 @@
+---
+title: "ClassComp"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+class_comp <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/class_comp.csv")
+```
+```{r}
+summary(class_comp)
+```
+
+```{r}
+class_comp |>
+  pivot_longer(
+    cols = c(first_year, sophomore, junior, senior, grad_student),
+    names_to = "class_year",
+    values_to = "count"
+  ) |>
+  ggplot(aes(x = count)) +
+  geom_histogram(binwidth = 2) +
+  facet_wrap(~ class_year, scales = "free_y")
+```
+
