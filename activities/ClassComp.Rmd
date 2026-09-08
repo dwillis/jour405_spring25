@@ -3,16 +3,26 @@ title: "ClassComp"
 output: html_document
 ---
 
+### Load the tidyverse
+
 ```{r}
 library(tidyverse)
 ```
 
+### Load the data
+
+
 ```{r}
 class_comp <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/class_comp.csv")
 ```
+
+### Show summary statistics
+
 ```{r}
 summary(class_comp)
 ```
+
+### Draw histograms
 
 ```{r}
 class_comp |>
@@ -25,4 +35,45 @@ class_comp |>
   geom_histogram(binwidth = 2) +
   facet_wrap(~ class_year, scales = "free_y")
 ```
+
+### Averages!
+
+```{r}
+class_comp |> 
+  summarize(mean_fy = mean(first_year), 
+            mean_soph = mean(sophomore),
+            mean_junior = mean(junior),
+            mean_senior = mean(senior), 
+            mean_gs = mean(grad_student))
+```
+
+### Actual Figures
+
+FY: 0 (0.4)
+SO: 4 (7)
+JR: 22 (20)
+SR: 12 (10)
+GS: 0 (1)
+
+### Dumbbell plot: actual vs. student estimate
+
+```{r}
+comparison <- tibble(
+  class_year = c("First Year", "Sophomore", "Junior", "Senior", "Grad Student"),
+  actual = c(0, 4, 22, 12, 0),
+  estimate = c(0.4, 7, 20, 10, 1)
+) |>
+  mutate(class_year = fct_inorder(class_year))
+
+ggplot(comparison) +
+  geom_segment(aes(x = actual, xend = estimate, y = class_year, yend = class_year),
+               color = "gray70") +
+  geom_point(aes(x = actual, y = class_year, color = "Actual"), size = 4) +
+  geom_point(aes(x = estimate, y = class_year, color = "Estimate"), size = 4) +
+  scale_color_manual(values = c("Actual" = "#1f77b4", "Estimate" = "#ff7f0e")) +
+  labs(x = "Number of students", y = NULL, color = NULL,
+       title = "Actual class composition vs. student estimates")
+```
+
+
 
